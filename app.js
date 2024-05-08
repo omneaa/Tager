@@ -1,8 +1,8 @@
 const express=require('express');
-
+const DB=require('./config/database')
 const app = express();
 const port = 3000;
-
+DB();
 app.get('/', (req, res) => {
   res.send('Welcome to my server!');
 });
