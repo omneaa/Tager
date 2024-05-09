@@ -2,7 +2,11 @@ const express=require('express');
 const DB=require('./config/database')
 const app = express();
 const port = 3000;
+const productRoutes = require('./products/Routes/product');
 DB();
+// midelware 
+app.use(express.json())
+app.use ('/products' , productRoutes)
 app.get('/', (req, res) => {
   res.send('Welcome to my server!');
 });
