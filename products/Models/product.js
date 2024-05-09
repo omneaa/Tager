@@ -1,12 +1,11 @@
 const mongoose = require('mongoose') ;
 const productSchema=mongoose.Schema({
     name : {
-        type: 'string'
+        type: String,
+        required: true
     },
-    // video : {
-
-    // }
+   
 })
 
-var productModel = mongoose.model('product', productSchema)
+var productModel = mongoose.model('products', productSchema)
 module.exports = productModel

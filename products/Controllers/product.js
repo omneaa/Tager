@@ -6,6 +6,7 @@ const AddProduct =async (req,res)=>{
     res.json({data : newproduct , msg : 'Product created successfully'});
    }catch(error){
     res.json({error : "Error creating product"});
+    
    }
 }
 module.exports = AddProduct;
