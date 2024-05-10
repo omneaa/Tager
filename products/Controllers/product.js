@@ -4,7 +4,8 @@ const cloudinary = require('../../utils/cloudinary');
 const AddProduct = async (req, res) => {
    try {
       console.log(req.body)
-      const result = await cloudinary.uploader.upload(req.file.path)
+      const result = await cloudinary.uploader.upload(req.file.path);
+
       res.json(result);
    } catch (error) {
       res.json({ error: 'Error creating product' });
