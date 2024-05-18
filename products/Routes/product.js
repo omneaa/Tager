@@ -1,6 +1,6 @@
 const express = require('express');
-const upload = require('../../utils/multer');
+const {productStorage} = require('../../utils/multer');
 var router = express.Router();
 var AddProduct  = require('../Controllers/product');
-router.post('/',upload.single('img'),AddProduct);
+router.post('/',productStorage.single('img'),AddProduct);
 module.exports = router;
