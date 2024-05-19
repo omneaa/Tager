@@ -1,12 +1,9 @@
 const productModel = require('../Models/product');
-const cloudinary = require('../../utils/cloudinary');
-// const uplooad = require('../../utils/multer');
+
 const AddProduct = async (req, res) => {
    try {
-      console.log(req.body)
-      const result = await cloudinary.uploader.upload(req.file.path);
-
-      res.json(result);
+      
+      res.json(req.file.path);
    } catch (error) {
       res.json({ error: 'Error creating product' });
    }
