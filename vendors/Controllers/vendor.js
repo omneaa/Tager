@@ -1,6 +1,6 @@
 
 const nodemailer = require('nodemailer');
-
+const vendorModel = require('../Models/vendor');
 const cloudinary = require('../../utils/cloudinary');
 var ID;
 const SendCode=async(req,res) =>{
@@ -51,4 +51,8 @@ const ValidateCode=async(req,res)=>{
 		}
 	
 };
+
+const NewVendor=async(req,res)=>{
+    
+}
 module.exports ={SendCode,ValidateCode} ;
