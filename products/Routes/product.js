@@ -4,7 +4,7 @@ var router = express.Router();
 const multer=require('multer')
 const path = require('path');
 
-var AddProduct  = require('../Controllers/product');
+var {AddProduct, getAllproducts ,editProductStatus}  = require('../Controllers/product');
 const fileFilter = (req, file, cb) => {
     let ext = path.extname(file.originalname);
     // consloe(ext)
@@ -16,6 +16,9 @@ const fileFilter = (req, file, cb) => {
   };
   
 const upload = multer({ storage, fileFilter});
-router.post('/',upload.fields([{ name: 'img', maxCount: 1 }, { name: 'video', maxCount: 1 }]),
+router.post('/add',upload.fields([{ name: 'img', maxCount: 1 }, { name: 'video', maxCount: 1 }]),
  AddProduct);
+
+router.get('/getall',getAllproducts);
+router.patch('/editstatus',editProductStatus);
 module.exports = router;

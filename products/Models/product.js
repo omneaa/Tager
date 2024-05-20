@@ -11,10 +11,10 @@ const choosesSchema =  mongoose.Schema({
         // required: true,
     
     }, 
-    imgchoose: {
-        type: String,
-        required: true,
-      },
+    // imgchoose: {
+    //     type: String,
+    //     required: true,
+    //   },
 
 });
 const productSchema=mongoose.Schema({
@@ -22,13 +22,24 @@ const productSchema=mongoose.Schema({
     //     type: String, 
     //     required: true,
     //   },
+      idVendor : {
+        // type: mongoose.Schema.Types.ObjectId,
+        // ref: 'Vendor',
+        // required: true,
+        type: String,
+        required: true,
+      },
       name: {
         type: String,
         required: true,
-        validate: {
-          validator: (value) => value.split(' ').length === 4,
-          message: 'Name must contain exactly 4 words',
-        },
+        // validate: {
+        //   validator: (value) => value.split(' ').length > 4,
+        //   message: 'Name must contain exactly 4 words',
+        // },
+      },
+      status :{
+        type: String,
+        required: true,
       },
       img: {
         type: String,
