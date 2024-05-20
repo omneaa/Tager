@@ -18,7 +18,8 @@ reqire:true
     },
        vendorEmail:{
         type:String,
-        reqire:true
+        reqire:true,
+        
         },
         typeOfLicense:{
             type:String,
@@ -33,12 +34,17 @@ reqire:true
             reqire:true
         },
         registeredWithAddedTax:{
-            type:String,
+            type: Boolean,
             reqire:true
         },
         AddedTaxFile:{
-
+            type:String,
+            reqire:true
+        },
+        logo:{
+            type:String,
+            reqire:true
         }
 })
-const vendorModel=mongoose.model('vendors',vendorSchema);
+const vendorModel=mongoose.model('vendor',vendorSchema);
 module.exports = vendorModel;
