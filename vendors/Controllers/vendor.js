@@ -1,58 +1,357 @@
 
 const nodemailer = require('nodemailer');
-const vendorModel = require('../Models/vendor');
+const jwt=require('jsonwebtoken');
+const dotenv = require('dotenv');
 const cloudinary = require('../../utils/cloudinary');
+const{sendNotification }=require('../../utils/sendNotification');
+const Vendor=require('../Models/vendor');
+const axios = require('axios');
 var ID;
-const SendCode=async(req,res) =>{
-
-    let mailTransporter =nodemailer.createTransport(
-		{
-			service: 'gmail',
-			auth: {
-				user: 'abrar.purpose@gmail.com',
-				pass: 'vjusorbiqjpjwhaz'
-			}
+const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+const jwtSecretKey = process.env.JWT_SECRET_KEY;
+let mailTransporter =nodemailer.createTransport(
+	{
+		service: 'gmail',
+		auth: {
+			user: 'abrar.purpose@gmail.com',
+			pass: 'vjusorbiqjpjwhaz'
 		}
-	);
+	}
+);
+
+const SendCode=async(req,res) =>{
+    
 ID=Math.trunc(Math.random() * (9999 - 1000) + 1000);
 let mailDetails = {
 	from: 'abrar.purpose@gmail.com',
 	to: `${req.params.email}`,
-	subject: 'Email Code ',
+	subject: 'Email Code',
 	text: `Hi this is your Code for the App ${ID}`
-};
-
+}
 mailTransporter.sendMail(mailDetails,function (err, data) {
 			if (err) {
 				console.log('Error Occurs');
                 console.error(err);
-				res.status(404).json(`${err}`);
+				res.status(500).json(`${err}`);
 			} else {
-				
-				res.status(200).json('Email sent successfully');
+				console.log(ID);
+				res.status(200).json({"message":'Email sent successfully to vendor '});
 			}
 		});
-
-
 };
+
+
 const ValidateCode=async(req,res)=>{
     var code=req.params.code;
+	try{
 	if(code==ID)
 		{
-		   
-			
-			res.status(200).json('the code is right');
-			return ;
+
+
+			const jwtSecretKey = process.env.JWT_SECRET_KEY;
+			const user=await Vendor.findOne({VendorEmail:req.email});
+			const data = {
+				time: Date(),
+				userId: user._id,
+			};
+			const token = jwt.sign(data, jwtSecretKey);
+			res.send({"message":'the code is right', "token":token});
 		}
+
 		else
 		{ 
 			res.status(400).json("the code is wrong");
 			
 		}
-	
+	}
+	catch(err){
+		res.status(500).json(`${err}`);
+	}
 };
+
 
 const NewVendor=async(req,res)=>{
     
+try{
+	const data={
+		vendorName: `${req.body.vendorName}`,
+		brandName: `${req.body.brandName}`,
+		vendorLocation: `${req.body.vendorLocation}`,
+		vendorPhone: `${req.body.vendorPhone}`,
+		vendorEmail: `${req.body.vendorEmail}`,
+		typeOfLicense: `${req.body.typeOfLicense}`,
+		licenseNumber: `${req.body.licenseNumber}`,
+		registeredWithAddedTax: `${req.body.registeredWithAddedTax}`,
+		LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
+		AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`,
+	}
+	const result=await Vendor.create(data);
+
+	let mailDetails = {
+		from: 'abrar.purpose@gmail.com',
+		to: `${req.body.vendorEmail}`,
+		subject: 'Email',
+		text: `Hi the admin approve your request you can login to the app now`
+	}
+	mailTransporter.sendMail(mailDetails,function (err, data) {
+				if (err) {
+					
+					
+					res.status(500).json(`${err}`);
+				} else {
+					
+					res.status(200).json({"message":'Email sent to vendor',"data":result});
+				}
+			});
+	
+
+
 }
-module.exports ={SendCode,ValidateCode} ;
+catch(e){
+	res.status(400).json("error");
+}}
+
+
+
+
+
+const NewVendorRequest=async(req,res)=>{
+	  
+try{
+
+
+
+	const data={
+		vendorName: `${req.body.vendorName}`,
+		brandName: `${req.body.brandName}`,
+		vendorLocation: `${req.body.vendorLocation}`,
+		vendorPhone: `${req.body.vendorPhone}`,
+		vendorEmail: `${req.body.vendorEmail}`,
+		typeOfLicense: `${req.body.typeOfLicense}`,
+		licenseNumber: `${req.body.licenseNumber}`,
+		registeredWithAddedTax: `${req.body.registeredWithAddedTax}`,
+		LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
+		AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`,
+	}
+	if (req.body.vendorName.length  === 0||req.body.brandName.length=== 0||req.body.vendorLocation.length===0||req.body.vendorPhone.length===0||req.body.vendorEmail.length===0||
+		req.body.typeOfLicense.length===0||req.body.licenseNumber.length===0||req.body.registeredWithAddedTax.length===0||req.files['AddedTaxFile'][0].path.length===0||
+		req.files['AddedTaxFile'][0].path.length===0
+	 )
+	 {
+		return res.status(400).json({message:"your input not math the fields requirements"});
+	 }
+	const notificationData = {
+        
+        Description: "new vendor request", 
+        details: data, 
+      };
+	  const response = await axios.post('https://webhook.site/ebb37a10-1f43-4bac-9100-03d89986e745',notificationData);
+	
+	  if (response.status === 200) {
+		res.status(200).json({"message":'your request sent to admins'});
+		  
+		} else {
+			res.status(400).json("Error sending your request please try later ");
+		  
+		}     
+	
+}
+catch(e){
+	res.status(400).json("error");
+} };
+
+
+
+
+
+
+/* 1 */
+const EditLogo=async(req,res)=>{
+
+
+
+			try {
+				const token = req.header('tokenHeaderKey');
+				const verified = jwt.verify(token, jwtSecretKey);
+				if (verified) {
+					const result=await Vendor.findByIdAndUpdate(req.params.Id,{"logo":req.file.path},{new:true,select:"logo"});
+					res.status(200).json({ message: "Logo Edited", data:result});
+			
+				} else {
+					return res.status(401).send({ message:'Invalid Token'});
+				}
+			} catch (error) {
+				return res.status(500).send('error');
+			}
+		};
+
+
+
+
+
+
+
+
+
+/*2*/
+const DeleteLogo=async(req,res)=>{
+	
+
+
+		const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+			const jwtSecretKey = process.env.JWT_SECRET_KEY;
+			try {
+				const token = req.header('tokenHeaderKey');
+				const verified = jwt.verify(token, jwtSecretKey);
+				if (verified) {
+				
+			const result=await Vendor.findByIdAndUpdate(req.params.Id,{$unset:{ "logo": ""}});
+res.status(200).json({ message: "Logo Deleted"});
+				} else {
+					return res.status(401).send('Invalid Token');
+				}
+			} catch (error) {
+				return res.status(500).send('error');
+			}
+		};
+		
+
+
+/*3*/
+const DeleteVendor=async(req,res)=>{
+	
+
+	try {
+		const token = req.header('tokenHeaderKey');
+		const verified = jwt.verify(token, jwtSecretKey);
+		if (verified) {
+			const result=await Vendor.findByIdAndDelete(req.params.Id);
+			res.status(200).json({ message: "Youe account deleted successfully"});
+	
+		} else {
+			return res.status(401).send({ message:'Invalid Token'});
+		}
+	} catch (error) {
+		return res.status(500).send('error');
+	}
+
+};
+
+
+
+
+/*4*/
+const EditVendor=async(req,res)=>{
+	try{
+		const result=await Vendor.findByIdAndUpdate(req.params.Id,{vendorName: `${req.body.vendorName}`,brandName: `${req.body.brandName}`,
+		vendorLocation: `${req.body.vendorLocation}`,
+		vendorPhone: `${req.body.vendorPhone}`,
+		vendorEmail: `${req.body.vendorEmail}`,
+		typeOfLicense: `${req.body.typeOfLicense}`,
+		licenseNumber: `${req.body.licenseNumber}`,
+		registeredWithAddedTax: `${req.body.registeredWithAddedTax}`,
+		LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
+		AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`},{new:true});
+	
+		let mailDetails = {
+			from: 'abrar.purpose@gmail.com',
+			to: `${req.body.vendorEmail}`,
+			subject: 'Email Code',
+			text: `Hi the Admins approve your Edit request`
+		}
+		mailTransporter.sendMail(mailDetails,function (err, data) {
+					if (err) {
+						console.log('Error Occurs');
+						console.error(err);
+						res.status(500).json(`${err}`);
+					} else {
+						
+						res.status(200).json({ message: "the vendor data updated", data:result});
+
+					}
+				});
+
+
+
+
+	}
+	catch{
+		res.status(400).json("Error");
+	}
+};
+
+
+
+/*5*/
+const EditVendorRequest=async(req,res)=>{
+	try{
+		const token = req.header('tokenHeaderKey');
+		const verified = jwt.verify(token, jwtSecretKey);
+		if (!verified) {
+			return res.status(401).send({ message:'Invalid Token'});
+		}
+		if (req.body.vendorName.length  === 0||req.body.brandName.length=== 0||req.body.vendorLocation.length===0||req.body.vendorPhone.length===0||req.body.vendorEmail.length===0||
+			req.body.typeOfLicense.length===0||req.body.licenseNumber.length===0||req.body.registeredWithAddedTax.length===0||req.files['AddedTaxFile'][0].path.length===0||
+			req.files['AddedTaxFile'][0].path.length===0
+		 )
+		 {
+			return res.status(400).json({message:"your input not math the fields requirements"});
+		 }
+
+		const data={
+			vendorName: `${req.body.vendorName}`,
+			brandName: `${req.body.brandName}`,
+			vendorLocation: `${req.body.vendorLocation}`,
+			vendorPhone: `${req.body.vendorPhone}`,
+			vendorEmail: `${req.body.vendorEmail}`,
+			typeOfLicense: `${req.body.typeOfLicense}`,
+			licenseNumber: `${req.body.licenseNumber}`,
+			registeredWithAddedTax: `${req.body.registeredWithAddedTax}`,
+			LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
+			AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`,
+		}
+		const notificationData = {
+			
+			Description: "Edit vendor request", 
+			AfterEdition: data, 
+			BeforeEdition:await Vendor.findById(req.params.Id)
+		  };
+		  const response = await axios.post('https://webhook.site/ebb37a10-1f43-4bac-9100-03d89986e745',notificationData);
+		
+		  if (response.status === 200) {
+			res.status(200).json({"message":'your Edition request sent to admins'});
+			  
+			} else {
+				res.status(500).json("Error sending your Edition request please try later ");
+			  
+			}     
+		
+	}
+	catch{
+		res.status(400).json("Error");
+	}
+};
+
+
+/*6*/
+const Logout=async(req,res)=>{
+	
+	
+	try {
+		const token = req.header('tokenHeaderKey');
+		const verified = jwt.verify(token, jwtSecretKey);
+		if (verified) {
+		
+			res.status(200).json({ message: "loged-out"});
+		} else {
+			return res.status(401).send('Invalid Token');
+		}
+	}
+	catch (error) {
+		return res.status(401).send('Invalid Token');
+	}
+
+}
+
+
+module.exports ={SendCode,ValidateCode,NewVendor,NewVendorRequest,Logout,EditLogo,EditVendor,EditVendorRequest,DeleteVendor,DeleteLogo,EditLogo};

@@ -1,6 +1,7 @@
 const express = require('express');
 const {storage} = require('../../utils/cloudinary');
 var router = express.Router();
+<<<<<<< HEAD
 const multer=require('multer')
 const path = require('path');
 
@@ -18,4 +19,15 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter});
 router.post('/',upload.fields([{ name: 'img', maxCount: 1 }, { name: 'video', maxCount: 1 }]),
  AddProduct);
+=======
+const multer=require('multer');
+const bodyParser = require('body-parser');
+bodyParser.json();
+const upload = multer({storage});
+var router = express.Router();
+var AddProduct  = require('../Controllers/product');
+
+
+router.post('/',upload.single('img'),AddProduct);
+>>>>>>> be35595ee95971fa2295c81ca3b2c32465e356dd
 module.exports = router;
