@@ -106,8 +106,33 @@ const editProductStatus = async (req, res) => {
     });
   }
 };
+const addReview = async (req, res) => {
+  try {
+    const { productId, userId, rating, reviewText } = req.body;
+   
+    const newReview = {
+      userId,
+      rating,
+      reviewText,
+    };
+    const updatedReviews = await productModel.findByIdAndUpdate(
+      productId,
+      { $push: { reviews: newReview } },
+      { new: true }
+  )
+    res.status(201).json({ message: 'Review added successfully', data: newReview });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: 'Failed to add review', error: error.message });
+  }
+};
+const getReviewsByVendorId = async(req,res) =>{
+
+}
 module.exports = {
   AddProduct,
   getAllproducts,
-  editProductStatus
+  editProductStatus,
+  addReview,
+  getReviewsByVendorId
 };

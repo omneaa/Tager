@@ -68,7 +68,37 @@ const productSchema=mongoose.Schema({
         type: [choosesSchema],
         required: true,
       },
-   
+      reviews: [
+        {
+          userId: {
+            type: String,
+          },
+          rating: {
+            type: Number,
+            min: 1,
+            max: 5,
+          },
+          reviewText: {
+            type: String,
+          },
+          createdAt: {
+            type: Date,
+            default: Date.now,
+          },
+          updatedAt: {
+            type: Date,
+            default: Date.now,
+          }
+        }
+    ] ,createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    }
+    
 })
 
 var productModel = mongoose.model('products', productSchema)
