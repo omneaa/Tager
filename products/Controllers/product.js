@@ -126,13 +126,51 @@ const addReview = async (req, res) => {
     res.status(400).json({ message: 'Failed to add review', error: error.message });
   }
 };
-// const getReviewsByVendorId = async(req,res) =>{
+const getproductsbyvendorid= async(req,res) =>{
+  try {
+    const vendorId = req.params.id; 
+    const products = await productModel.find({ 'idVendor': vendorId });
+    return res.status(200).json({ message: 'Products retrieved successfully', data: products });
 
-// }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Failed to retrieve products', error: error.message });
+  }
+}
+
+const getReviewsByVendorId = async (req, res) => {
+  try {
+    const vendorId = req.params.id;
+
+    // Efficiently retrieve product IDs and populate reviews using Mongoose
+    const productReviews = await productModel.find({ 'idVendor': vendorId } ); 
+     
+    if (!productReviews.length) {
+      return res.status(200).json({ message: 'No products found for this vendor' }); // Informative message
+    }
+
+    // Extract relevant data for response
+    const filteredData = productReviews.map((product) => ({
+      productId: product._id,
+      reviews: product.reviews.map((review) => ({
+        rating: review.rating,
+        reviewText: review.reviewText,
+        createdAt: review.createdAt,
+        updatedAt: review.updatedAt
+      })),
+    }));
+
+    return res.status(200).json({ message: 'Product reviews retrieved successfully', data: filteredData });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Failed to retrieve product reviews', error: error.message });
+  }
+}
 module.exports = {
   AddProduct,
   getAllproducts,
   editProductStatus,
   addReview,
-  // getReviewsByVendorId
+  getproductsbyvendorid,
+  getReviewsByVendorId
 };

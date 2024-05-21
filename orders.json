@@ -1,0 +1,45 @@
+[
+    {
+      "order_id": 1,
+      "customer_id": 2,
+      "order_date": "2024-05-21T10:20:00.000Z",
+      "order_status": "pending",
+      "order_total": 123.45,
+      "shipping_address": {
+        "street": "123 Main Street",
+        "city": "Anytown",
+        "state": "CA",
+        "zip": "12345"
+      },
+      "billing_address": {
+        "street": "456 Elm Street",
+        "city": "Anytown",
+        "state": "CA",
+        "zip": "12345"
+      },
+      "payment_method": "credit card",
+      "additional_information": ""
+    },
+    {
+      "order_id": 2,
+      "customer_id": 1, 
+      "order_date": "2024-05-15T15:30:00.000Z", 
+      "order_status": "shipped",
+      "order_total": 78.90,
+      "shipping_address": {
+        "street": "789 Maple Street",
+        "city": "Springfield",
+        "state": "NY",
+        "zip": "54321"
+      },
+      "billing_address": {
+        "street": "500 Elm Street",
+        "city": "Anytown",
+        "state": "CA",
+        "zip": "1245"
+      },
+      "payment_method": "debit card",
+      "additional_information": "Please hold for signature"
+    }
+  ]
+  
