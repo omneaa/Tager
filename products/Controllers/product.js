@@ -126,13 +126,13 @@ const addReview = async (req, res) => {
     res.status(400).json({ message: 'Failed to add review', error: error.message });
   }
 };
-const getReviewsByVendorId = async(req,res) =>{
+// const getReviewsByVendorId = async(req,res) =>{
 
-}
+// }
 module.exports = {
   AddProduct,
   getAllproducts,
   editProductStatus,
   addReview,
-  getReviewsByVendorId
+  // getReviewsByVendorId
 };
