@@ -73,23 +73,12 @@ const ValidateCode=async(req,res)=>{
 const NewVendor=async(req,res)=>{
     
 try{
-	const data={
-		vendorName: `${req.body.vendorName}`,
-		brandName: `${req.body.brandName}`,
-		vendorLocation: `${req.body.vendorLocation}`,
-		vendorPhone: `${req.body.vendorPhone}`,
-		vendorEmail: `${req.body.vendorEmail}`,
-		typeOfLicense: `${req.body.typeOfLicense}`,
-		licenseNumber: `${req.body.licenseNumber}`,
-		registeredWithAddedTax: `${req.body.registeredWithAddedTax}`,
-		LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
-		AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`,
-	}
-	const result=await Vendor.create(data);
+	if(req.params.status==="1"){
+const result=await Vendor.findByIdAndUpdate(req.params.Id,{status:"accepted"},{new:true});
 
 	let mailDetails = {
 		from: 'abrar.purpose@gmail.com',
-		to: `${req.body.vendorEmail}`,
+		to: `${req.params.email}`,
 		subject: 'Email',
 		text: `Hi the admin approve your request you can login to the app now`
 	}
@@ -97,18 +86,37 @@ try{
 				if (err) {
 					
 					
-					res.status(500).json(`${err}`);
+					res.status(500).json( `${err}`);
 				} else {
 					
 					res.status(200).json({"message":'Email sent to vendor',"data":result});
 				}
 			});
-	
-
 
 }
+else
+{
+	const result=await Vendor.findByIdAndDelete(req.params.Id);
+	let mailDetails = {
+		from: 'abrar.purpose@gmail.com',
+		to: `${req.params.email}`,
+		subject: 'Email',
+		text: `Hi the admin rejected your request `
+	}
+	mailTransporter.sendMail(mailDetails,function (err, data) {
+				if (err) {
+					
+					
+					res.status(500).json( `${err}`);
+				} else {
+					
+					res.status(200).json({"message":'Email sent to vendor',"data":result});
+				}
+			});
+}
+}
 catch(e){
-	res.status(400).json("error");
+	res.status(400).json(e);
 }}
 
 
@@ -140,24 +148,42 @@ try{
 	 {
 		return res.status(400).json({message:"your input not math the fields requirements"});
 	 }
-	const notificationData = {
-        
-        Description: "new vendor request", 
-        details: data, 
-      };
-	  const response = await axios.post('https://webhook.site/ebb37a10-1f43-4bac-9100-03d89986e745',notificationData);
+	//  const findVendor=await Vendor.findOne({"vendorEmail":req.body.VendorEmail});
+	 
+	//  if(findVendor)
+	//  {
+	// 	return res.status(400).json({message:"this email alreadt exsit"});
+	//  }
+	 
+
+	 const result=await Vendor.create(data);
+	   if (result) {
+		res.status(200).json({"message":'your request sent to admins',data:result});
 	
-	  if (response.status === 200) {
-		res.status(200).json({"message":'your request sent to admins'});
-		  
 		} else {
 			res.status(400).json("Error sending your request please try later ");
 		  
 		}     
 	
+
+	// const notificationData = {
+        
+    //     Description: "new vendor request", 
+    //     details: data, 
+    //   };
+	//   const response = await axios.post('https://webhook.site/ebb37a10-1f43-4bac-9100-03d89986e745',notificationData);
+	
+	//   if (response.status === 200) {
+	// 	res.status(200).json({"message":'your request sent to admins'});
+		  
+	// 	} else {
+	// 		res.status(400).json("Error sending your request please try later ");
+		  
+	// 	}     
+	
 }
 catch(e){
-	res.status(400).json("error");
+	res.status(400).json(e);
 } };
 
 
@@ -354,4 +380,12 @@ const Logout=async(req,res)=>{
 }
 
 
-module.exports ={SendCode,ValidateCode,NewVendor,NewVendorRequest,Logout,EditLogo,EditVendor,EditVendorRequest,DeleteVendor,DeleteLogo,EditLogo};
+module.exports ={SendCode,ValidateCode
+	,NewVendor,
+	NewVendorRequest,
+	Logout,EditLogo,
+	EditVendor,
+	EditVendorRequest,
+	DeleteVendor,
+	DeleteLogo,
+	EditLogo};

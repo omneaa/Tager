@@ -43,7 +43,12 @@ reqire:true
         },
         logo:{
             type:String,
-            reqire:true
+            
+        },
+
+        status:{
+ type:String,
+ default:"bending"
         }
 })
 const vendorModel=mongoose.model('vendor',vendorSchema);
