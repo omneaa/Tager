@@ -1,27 +1,11 @@
 const productModel = require('../Models/product');
-
 const AddProduct = async (req, res) => {
   try {
-
     const requiredFields = ['name', 'description', 'hashtag', 'price', 'warranty', 'therearechooses'];
     const missingFields = requiredFields.filter(field => !req.body[field]);
     if (missingFields.length > 0) {
       throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
-    const choosesArray = [];
-    const numChooses = Object.keys(req.body)
-      .filter(key => key.startsWith('chooses[')) // Filter keys starting with chooses[
-      .map(key => parseInt(key.match(/chooses\[(\d+)\]/)[1], 10)) // Extract integer index using regex
-      .reduce((maxIndex, currentIndex) => Math.max(maxIndex, currentIndex), 0); // Find max index
-
-    for (let i = 0; i <= numChooses; i++) {
-      choosesArray.push({
-        namechoose: req.body[`chooses[${i}].namechoose`],
-        pricetypechoose: req.body[`chooses[${i}].pricetypechoose`],
-        pricechoose: req.body[`chooses[${i}].pricechoose`] ? parseFloat(req.body[`chooses[${i}].pricechoose`]) : null, // Handle optional pricechoose
-        imgchoose: req.body[`chooses[${i}].imgchoose`],
-      });
-    }
+    }  
     const product = new productModel({
       //  video :`${req.files['video'][0].path}` ,
       idVendor: `664a354669855d6c78baf126`,
@@ -34,7 +18,7 @@ const AddProduct = async (req, res) => {
       typeWarranty: `${req.body.typeWarranty}`,
       status: "Pending",
       therearechooses: `${req.body.therearechooses}`,
-      chooses: choosesArray,
+      // chooses: choosesArray,
     });
     // console.log('chooses data before saving:', product.chooses)
     // console.log(`${req.body.chooses[1].namechoose}`);
@@ -109,7 +93,6 @@ const editProductStatus = async (req, res) => {
 const addReview = async (req, res) => {
   try {
     const { productId, userId, rating, reviewText } = req.body;
-   
     const newReview = {
       userId,
       rating,
@@ -126,6 +109,27 @@ const addReview = async (req, res) => {
     res.status(400).json({ message: 'Failed to add review', error: error.message });
   }
 };
+const Addchoose=async(req,res)=>{
+  try {
+    const productId = req.params.id;
+    const newChoose = {
+      namechoose: `${req.body.namechoose}`,
+      pricetypechoose: `${req.body.pricetypechoose}`,
+      pricechoose: `${req.body.pricechoose}`? parseFloat(req.body.pricechoose) : null,
+      img: `${req.file.path}`,
+    }
+
+    const updatedReviews = await productModel.findByIdAndUpdate(
+      productId,
+      { $push: { chooses: newChoose} },
+      { new: true }
+  )
+    res.status(201).json({ message: 'Choose added successfully', data: newChoose });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: 'Failed to add Choose', error: error.message });
+  }
+}
 const getproductsbyvendorid= async(req,res) =>{
   try {
     const vendorId = req.params.id; 
@@ -141,15 +145,11 @@ const getproductsbyvendorid= async(req,res) =>{
 const getReviewsByVendorId = async (req, res) => {
   try {
     const vendorId = req.params.id;
-
-    // Efficiently retrieve product IDs and populate reviews using Mongoose
     const productReviews = await productModel.find({ 'idVendor': vendorId } ); 
      
     if (!productReviews.length) {
-      return res.status(200).json({ message: 'No products found for this vendor' }); // Informative message
+      return res.status(200).json({ message: 'No products found for this vendor' }); 
     }
-
-    // Extract relevant data for response
     const filteredData = productReviews.map((product) => ({
       productId: product._id,
       reviews: product.reviews.map((review) => ({
@@ -172,5 +172,6 @@ module.exports = {
   editProductStatus,
   addReview,
   getproductsbyvendorid,
-  getReviewsByVendorId
+  getReviewsByVendorId ,
+  Addchoose
 };

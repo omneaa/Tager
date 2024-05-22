@@ -1,96 +1,88 @@
-const mongoose = require('mongoose') ;
-const choosesSchema =  mongoose.Schema({
-    namechoose: { type: String, required: true },
-    pricetypechoose :{
-        type : String, 
-        enum : ['same' , 'different'] ,
-        required : true
-    }, 
-    pricechoose :{
-        type: Number,
-        // required: true,
-    
-    }, 
-    // imgchoose: {
-    //     type: String,
-    //     required: true,
-    //   },
+const mongoose = require('mongoose');
 
-});
-const productSchema=mongoose.Schema({
-    // video: {
-    //     type: String, 
-    //     required: true,
-    //   },
-      idVendor : {
-        // type: mongoose.Schema.Types.ObjectId,
-        // ref: 'Vendor',
-        // required: true,
+const productSchema = mongoose.Schema({
+  // video: {
+  //     type: String, 
+  //     required: true,
+  //   },
+  idVendor: {
+    // type: mongoose.Schema.Types.ObjectId,
+    // ref: 'Vendor',
+    // required: true,
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+    // validate: {
+    //   validator: (value) => value.split(' ').length > 4,
+    //   message: 'Name must contain exactly 4 words',
+    // },
+  },
+  status: {
+    type: String,
+    required: true,
+  },
+  img: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  hashtag: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  warranty: {
+    type: Boolean,
+    required: true,
+  },
+  typeWarranty: {
+    type: String,
+    enum: ['return', 'repair', 'replacement'],
+  },
+  therearechooses: {
+    type: Boolean,
+    required: true,
+  },
+  chooses: [{
+      namechoose: {
         type: String,
-        required: true,
+        required: true
       },
-      name: {
+      pricetypechoose: {
         type: String,
-        required: true,
-        // validate: {
-        //   validator: (value) => value.split(' ').length > 4,
-        //   message: 'Name must contain exactly 4 words',
-        // },
+        enum: ['same', 'different'],
+        required: true
       },
-      status :{
-        type: String,
-        required: true,
+      pricechoose: {
+        type: Number,
       },
       img: {
         type: String,
-        required: true,
       },
-      description: {
-        type: String,
-        required: true,
-      },
-      hashtag : {
-        type : String,
-        required: true,
-      },price:{
-        type : Number,
-        required: true,
-      },warranty :{
-        type : Boolean,
-        required: true,
-      }, typeWarranty:{
-        type: String,
-        enum: ['return', 'repair', 'replacement'],
-      },therearechooses:{
-        type:Boolean,
-        required: true,
-      }, chooses:{
-        type: [choosesSchema],
-        required: true,
-      },
-      reviews: [
-        {
-          userId: {
-            type: String,
-          },
-          rating: {
-            type: Number,
-            min: 1,
-            max: 5,
-          },
-          reviewText: {
-            type: String,
-          },
-          createdAt: {
-            type: Date,
-            default: Date.now,
-          },
-          updatedAt: {
-            type: Date,
-            default: Date.now,
-          }
-        }
-    ] ,createdAt: {
+    }
+  ],
+  reviews: [{
+    userId: {
+      type: String,
+    },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
+    reviewText: {
+      type: String,
+    },
+    createdAt: {
       type: Date,
       default: Date.now,
     },
@@ -98,7 +90,16 @@ const productSchema=mongoose.Schema({
       type: Date,
       default: Date.now,
     }
-    
+  }],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  }
+
 })
 
 var productModel = mongoose.model('products', productSchema)
