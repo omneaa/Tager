@@ -1,5 +1,5 @@
 const mongoose=require('mongoose');
-const vendorSchema=mongoose.Schema({
+const EditRequestSchema=mongoose.Schema({
     vendorName:{
 type:String,
 reqire:true
@@ -41,7 +41,7 @@ reqire:true
             type:String,
             reqire:true
         },
-        logo:{
+        VendorId:{
             type:String,
             
         },
@@ -51,5 +51,5 @@ reqire:true
  default:"pending"
         }
 })
-const vendorModel=mongoose.model('vendor',vendorSchema);
-module.exports = vendorModel;
+const EditModel=mongoose.model('EditRequest',EditRequestSchema);
+module.exports = EditModel;

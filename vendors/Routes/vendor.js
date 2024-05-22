@@ -4,6 +4,7 @@ var router = express.Router();
 const multer=require('multer');
 const bodyParser = require('body-parser');
 const path = require('path');
+const {auth} = require('../../middlewares/auth') ;
 bodyParser.json();
 var router = express.Router();
 const {ValidateCode,SendCode,NewVendor,NewVendorRequest,Logout,EditLogo,DeleteLogo,DeleteVendor,EditVendor,EditVendorRequest}=require('../Controllers/vendor');
@@ -46,17 +47,17 @@ router.post('/new-vendor/:Id/:email/:status',NewVendor);
 
 router.post('/new-vendor-request',upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),NewVendorRequest);
 
-router.put('/logo/:Id',upload2.single('img'),EditLogo);
+router.put('/logo/:Id',auth,upload2.single('img'),EditLogo);
 
-router.delete('/logo/:Id',DeleteLogo);
+router.delete('/logo/:Id',auth,DeleteLogo);
 
-router.delete('/vendor/:Id',DeleteVendor);
+router.delete('/vendor/:Id',auth,DeleteVendor);
 
-router.patch('/vendor/:Id',upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),EditVendor);
+router.patch('/vendor/:Id/:Request_Id/:Status/:vendorEmail',upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),EditVendor);
 
-router.post('/edit-vendor-request/:Id',upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),EditVendorRequest);
+router.post('/edit-vendor-request/:Id',auth,upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),EditVendorRequest);
 
-router.post('/logout',Logout);
+router.post('/logout',auth,Logout);
 
 module.exports = router;
 

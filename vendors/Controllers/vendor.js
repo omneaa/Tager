@@ -5,10 +5,11 @@ const dotenv = require('dotenv');
 const cloudinary = require('../../utils/cloudinary');
 const{sendNotification }=require('../../utils/sendNotification');
 const Vendor=require('../Models/vendor');
+const EditRequest=require('../Models/Edit');
 const axios = require('axios');
 var ID;
 const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
-const jwtSecretKey = process.env.JWT_SECRET_KEY;
+const jwtSecretKey = process.env.SECRET;
 let mailTransporter =nodemailer.createTransport(
 	{
 		service: 'gmail',
@@ -48,14 +49,14 @@ const ValidateCode=async(req,res)=>{
 		{
 
 
-			const jwtSecretKey = process.env.JWT_SECRET_KEY;
+			const jwtSecretKey = process.env.SECRET;
 			const user=await Vendor.findOne({VendorEmail:req.email});
 			const data = {
 				time: Date(),
 				userId: user._id,
 			};
 			const token = jwt.sign(data, jwtSecretKey);
-			res.send({"message":'the code is right', "token":token});
+			res.send({"message":'the code is right', "token":token,"data":user});
 		}
 
 		else
@@ -128,7 +129,6 @@ const NewVendorRequest=async(req,res)=>{
 try{
 
 
-
 	const data={
 		vendorName: `${req.body.vendorName}`,
 		brandName: `${req.body.brandName}`,
@@ -197,23 +197,14 @@ const EditLogo=async(req,res)=>{
 
 
 			try {
-				const token = req.header('tokenHeaderKey');
-				const verified = jwt.verify(token, jwtSecretKey);
-				if (verified) {
+				
 					const result=await Vendor.findByIdAndUpdate(req.params.Id,{"logo":req.file.path},{new:true,select:"logo"});
 					res.status(200).json({ message: "Logo Edited", data:result});
-			
-				} else {
-					return res.status(401).send({ message:'Invalid Token'});
-				}
-			} catch (error) {
+			}
+				catch (error) {
 				return res.status(500).send('error');
 			}
 		};
-
-
-
-
 
 
 
@@ -224,18 +215,13 @@ const DeleteLogo=async(req,res)=>{
 	
 
 
-		const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
-			const jwtSecretKey = process.env.JWT_SECRET_KEY;
+		
 			try {
 				const token = req.header('tokenHeaderKey');
 				const verified = jwt.verify(token, jwtSecretKey);
-				if (verified) {
-				
-			const result=await Vendor.findByIdAndUpdate(req.params.Id,{$unset:{ "logo": ""}});
-res.status(200).json({ message: "Logo Deleted"});
-				} else {
-					return res.status(401).send('Invalid Token');
-				}
+			    const result=await Vendor.findByIdAndUpdate(req.params.Id,{$unset:{ "logo": ""}});
+                res.status(200).json({ message: "Logo Deleted"});
+
 			} catch (error) {
 				return res.status(500).send('error');
 			}
@@ -248,15 +234,9 @@ const DeleteVendor=async(req,res)=>{
 	
 
 	try {
-		const token = req.header('tokenHeaderKey');
-		const verified = jwt.verify(token, jwtSecretKey);
-		if (verified) {
+		
 			const result=await Vendor.findByIdAndDelete(req.params.Id);
 			res.status(200).json({ message: "Youe account deleted successfully"});
-	
-		} else {
-			return res.status(401).send({ message:'Invalid Token'});
-		}
 	} catch (error) {
 		return res.status(500).send('error');
 	}
@@ -265,23 +245,21 @@ const DeleteVendor=async(req,res)=>{
 
 
 
-
+//router.patch('/vendor/:Id/:Request_Id/:Status/:vendorEmail'
 /*4*/
 const EditVendor=async(req,res)=>{
 	try{
-		const result=await Vendor.findByIdAndUpdate(req.params.Id,{vendorName: `${req.body.vendorName}`,brandName: `${req.body.brandName}`,
-		vendorLocation: `${req.body.vendorLocation}`,
-		vendorPhone: `${req.body.vendorPhone}`,
-		vendorEmail: `${req.body.vendorEmail}`,
-		typeOfLicense: `${req.body.typeOfLicense}`,
-		licenseNumber: `${req.body.licenseNumber}`,
-		registeredWithAddedTax: `${req.body.registeredWithAddedTax}`,
-		LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
-		AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`},{new:true});
+		if(req.params.Status==="1"){
+		const result=await EditRequest.findById(req.params.Request_Id);
+		const data=await Vendor.findByIdAndUpdate(req.params.Id,{"vendorName":result.vendorName,"brandName":result.brandName
+			,"vendorLocation":result.vendorLocation,vendorPhone:result.vendorPhone,"vendorEmail": result.vendorEmail,
+			"typeOfLicense":result.typeOfLicense, licenseNumber: result.licenseNumber,registeredWithAddedTax:result.registeredWithAddedTax,
+			LicenseFile:result.LicenseFile,"AddedTaxFile":result.AddedTaxFile},{new:true});
+			
 	
 		let mailDetails = {
 			from: 'abrar.purpose@gmail.com',
-			to: `${req.body.vendorEmail}`,
+			to: `${req.params.vendorEmail}`,
 			subject: 'Email Code',
 			text: `Hi the Admins approve your Edit request`
 		}
@@ -292,17 +270,37 @@ const EditVendor=async(req,res)=>{
 						res.status(500).json(`${err}`);
 					} else {
 						
-						res.status(200).json({ message: "the vendor data updated", data:result});
+						res.status(200).json({ message: "the vendor data updated"});
 
 					}
 				});
+			}
+			else{
 
+				const result=await EditRequest.findByIdAndDelete(req.params.Request_Id);
+				let mailDetails = {
+					from: 'abrar.purpose@gmail.com',
+					to: `${req.params.vendorEmail}`,
+					subject: 'Email Code',
+					text: `Hi the Admins rejected your Edit request`
+				}
+				mailTransporter.sendMail(mailDetails,function (err, data) {
+							if (err) {
+								console.log('Error Occurs');
+								console.error(err);
+								res.status(500).json(`${err}`);
+							} else {
+								res.status(200).json({ message: "the vendor edit request rejected"});
+								//res.status(200).json({ message: "Done"});
+		
+							}
+						});
+					}
+					
+			}
 
-
-
-	}
-	catch{
-		res.status(400).json("Error");
+	catch(e){
+		res.status(400).json(e);
 	}
 };
 
@@ -311,11 +309,7 @@ const EditVendor=async(req,res)=>{
 /*5*/
 const EditVendorRequest=async(req,res)=>{
 	try{
-		const token = req.header('tokenHeaderKey');
-		const verified = jwt.verify(token, jwtSecretKey);
-		if (!verified) {
-			return res.status(401).send({ message:'Invalid Token'});
-		}
+		
 		if (req.body.vendorName.length  === 0||req.body.brandName.length=== 0||req.body.vendorLocation.length===0||req.body.vendorPhone.length===0||req.body.vendorEmail.length===0||
 			req.body.typeOfLicense.length===0||req.body.licenseNumber.length===0||req.body.registeredWithAddedTax.length===0||req.files['AddedTaxFile'][0].path.length===0||
 			req.files['AddedTaxFile'][0].path.length===0
@@ -335,26 +329,30 @@ const EditVendorRequest=async(req,res)=>{
 			registeredWithAddedTax: `${req.body.registeredWithAddedTax}`,
 			LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
 			AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`,
+			VendorId:req.params.Id,
 		}
-		const notificationData = {
+		const result=await EditRequest.create(data);
+		return res.status(200).json({message:"your Request sent to admins"});
+console.log(result);
+		// const notificationData = {
 			
-			Description: "Edit vendor request", 
-			AfterEdition: data, 
-			BeforeEdition:await Vendor.findById(req.params.Id)
-		  };
-		  const response = await axios.post('https://webhook.site/ebb37a10-1f43-4bac-9100-03d89986e745',notificationData);
+		// 	Description: "Edit vendor request", 
+		// 	AfterEdition: data, 
+		// 	BeforeEdition:await Vendor.findById(req.params.Id)
+		//   };
+		//   const response = await axios.post('https://webhook.site/ebb37a10-1f43-4bac-9100-03d89986e745',notificationData);
 		
-		  if (response.status === 200) {
-			res.status(200).json({"message":'your Edition request sent to admins'});
+		//   if (response.status === 200) {
+		// 	res.status(200).json({"message":'your Edition request sent to admins'});
 			  
-			} else {
-				res.status(500).json("Error sending your Edition request please try later ");
+		// 	} else {
+		// 		res.status(500).json("Error sending your Edition request please try later ");
 			  
-			}     
+		// 	}     
 		
 	}
-	catch{
-		res.status(400).json("Error");
+	catch(e){
+		res.status(400).json(e);
 	}
 };
 
@@ -364,14 +362,11 @@ const Logout=async(req,res)=>{
 	
 	
 	try {
-		const token = req.header('tokenHeaderKey');
-		const verified = jwt.verify(token, jwtSecretKey);
-		if (verified) {
+		
 		
 			res.status(200).json({ message: "loged-out"});
-		} else {
-			return res.status(401).send('Invalid Token');
-		}
+		
+		
 	}
 	catch (error) {
 		return res.status(401).send('Invalid Token');
