@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema({
-  // video: {
-  //     type: String, 
-  //     required: true,
-  //   },
+  video: {
+      type: String, 
+      required: true,
+    },
   idVendor: {
     // type: mongoose.Schema.Types.ObjectId,
     // ref: 'Vendor',

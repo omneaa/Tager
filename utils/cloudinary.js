@@ -13,7 +13,8 @@ const storage = new CloudinaryStorage({
     cloudinary,
     params: {
         folder: 'products',
-        allowedFormats: ['.jpeg', '.png', '.jpg'],
+        allowedFormats: ['.jpeg', '.png', '.jpg','.gif','.bmp','.tiff','.mov','.wmv','.flv','.webm','.webp','.mp4'],
+        resource_type: 'auto'
     }
 });
 const storage2=new CloudinaryStorage({

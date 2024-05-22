@@ -8,7 +8,7 @@ var {AddProduct, getAllproducts ,editProductStatus, addReview , getproductsbyven
 const fileFilter = (req, file, cb) => {
     let ext = path.extname(file.originalname);
     // consloe(ext)
-    let allowedExtensions = ['.png', '.jpg', '.jpeg','.wmv','.mp4']; 
+    let allowedExtensions = ['.jpeg', '.png', '.jpg','.gif','.bmp','.tiff','.mov','.wmv','.flv','.webm','.webp','.mp4']; 
     if (!allowedExtensions.includes(ext.toLowerCase())) {
       return cb(new Error('Only images (png, jpg, jpeg)'), false);
     }
