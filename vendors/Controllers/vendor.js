@@ -332,7 +332,7 @@ const EditVendorRequest=async(req,res)=>{
 			VendorId:req.params.Id,
 		}
 		const result=await EditRequest.create(data);
-		return res.status(200).json({message:"your Request sent to admins"});
+		return res.status(200).json({message:"your Request sent to admins" , data : result});;
 console.log(result);
 		// const notificationData = {
 			

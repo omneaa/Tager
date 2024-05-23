@@ -67,7 +67,9 @@ const productSchema = mongoose.Schema({
       },
       img: {
         type: String,
-      },
+      },color :{
+        type: String,
+      }
     }
   ],
   reviews: [{

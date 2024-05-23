@@ -20,7 +20,7 @@ router.post('/add',upload.fields([{ name: 'img', maxCount: 1 },
  AddProduct);
 router.patch('/choose/:id' , upload.single('img') , Addchoose) ; 
 router.get('/getall', auth,getAllproducts);
-router.patch('/editstatus',editProductStatus);
+router.patch('/editstatus/:vendorEmail',editProductStatus);
 router.patch('/addreview' ,addReview) ;
 router.get('/products/:id',auth,getproductsbyvendorid)
 router.get('/reviews/:id',auth,getReviewsByVendorId)

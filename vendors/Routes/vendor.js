@@ -53,7 +53,9 @@ router.delete('/logo/:Id',auth,DeleteLogo);
 
 router.delete('/vendor/:Id',auth,DeleteVendor);
 
-router.patch('/vendor/:Id/:Request_Id/:Status/:vendorEmail',upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),EditVendor);
+router.patch('/vendor/:Id/:Request_Id/:Status/:vendorEmail',
+upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }])
+,EditVendor);
 
 router.post('/edit-vendor-request/:Id',auth,upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),EditVendorRequest);
 
