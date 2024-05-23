@@ -6,7 +6,7 @@ const productSchema = mongoose.Schema({
       required: true,
     },
   idVendor: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.SchemaTypes.ObjectId,
     ref: 'vendor',
     required: true,
     // type: String,
@@ -15,10 +15,10 @@ const productSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
-    // validate: {
-    //   validator: (value) => value.split(' ').length > 4,
-    //   message: 'Name must contain exactly 4 words',
-    // },
+    validate: {
+      validator: (value) => value.trim().split(/\s+/).length <= 4,
+      message: 'Name must contain less than or equal to 4 words',
+    },
   },
   status: {
     type: String,

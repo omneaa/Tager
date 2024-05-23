@@ -10,8 +10,9 @@ const fileFilter = (req, file, cb) => {
     // consloe(ext)
     let allowedExtensions = ['.jpeg', '.png', '.jpg','.gif','.bmp','.tiff','.mov','.wmv','.flv','.webm','.webp','.mp4']; 
     if (!allowedExtensions.includes(ext.toLowerCase())) {
-      return cb(new Error('Only images (png, jpg, jpeg)'), false);
+      return cb(new Error('Only images and Videos'), false);
     }
+    
     cb(null, true);
   };
 const upload = multer({ storage, fileFilter});

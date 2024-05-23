@@ -36,7 +36,7 @@ const AddProduct = async (req, res) => {
       status: "Pending",
       therearechooses: `${req.body.therearechooses}`,
     });
-
+    
     await product.save();
 
     res.status(200).json({
