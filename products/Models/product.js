@@ -6,11 +6,11 @@ const productSchema = mongoose.Schema({
       required: true,
     },
   idVendor: {
-    // type: mongoose.Schema.Types.ObjectId,
-    // ref: 'Vendor',
-    // required: true,
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'vendor',
     required: true,
+    // type: String,
+    // required: true,
   },
   name: {
     type: String,

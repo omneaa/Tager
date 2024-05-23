@@ -21,9 +21,11 @@ const AddProduct = async (req, res) => {
     if (missingFields.length > 0) {
       throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
     }
+    var x = req.params.id ;
+    // console.log(req.params.id); 
     const product = new productModel({
       video: `${req.files["video"][0].path}`,
-      idVendor: `664a354669855d6c78baf126`,
+      idVendor: x,
       name: `${req.body.name}`,
       img: `${req.files["img"][0].path}`,
       description: `${req.body.description}`,
@@ -36,6 +38,7 @@ const AddProduct = async (req, res) => {
     });
 
     await product.save();
+
     res.status(200).json({
       message: "Added successfully",
       data: product,

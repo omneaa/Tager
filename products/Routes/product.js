@@ -15,7 +15,7 @@ const fileFilter = (req, file, cb) => {
     cb(null, true);
   };
 const upload = multer({ storage, fileFilter});
-router.post('/add',upload.fields([{ name: 'img', maxCount: 1 },
+router.post('/add/:id',upload.fields([{ name: 'img', maxCount: 1 },
                       { name: 'video', maxCount: 1 }]),
  AddProduct);
 router.patch('/choose/:id' , upload.single('img') , Addchoose) ; 
