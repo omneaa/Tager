@@ -10,6 +10,7 @@ const productSchema = mongoose.Schema({
     ref: 'vendor',
     required: true,
     // type: String,
+    
     // required: true,
   },
   name: {
