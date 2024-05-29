@@ -7,7 +7,9 @@ const path = require('path');
 const {auth} = require('../../middlewares/auth') ;
 bodyParser.json();
 var router = express.Router();
-const {ValidateCode,SendCode,NewVendor,NewVendorRequest,Logout,EditLogo,DeleteLogo,DeleteVendor,EditVendor,EditVendorRequest}=require('../Controllers/vendor');
+const {ValidateCode,SendCode,NewVendor,NewVendorRequest,Logout,EditLogo,DeleteLogo,DeleteVendor,EditVendor,EditVendorRequest
+  ,NewVendorValidateCode
+}=require('../Controllers/vendor');
 var ID;
 
 
@@ -44,7 +46,9 @@ router.post('/send-code/:email',SendCode);
 router.post('/validate-code/:code/:email',ValidateCode);
 
 router.post('/new-vendor/:Id/:email/:status',NewVendor);
+// EmailValidateCode
 
+router.post('/new-vendor-validate-code/:code',NewVendorValidateCode);
 router.post('/new-vendor-request',upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),NewVendorRequest);
 
 router.put('/logo/:Id',auth,upload2.single('img'),EditLogo);

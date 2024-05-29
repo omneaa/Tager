@@ -8,6 +8,29 @@ const Vendor=require('../Models/vendor');
 const EditRequest=require('../Models/Edit');
 const axios = require('axios');
 var ID;
+var newRequestCode;
+var vendorName,
+brandName,
+vendorLocation,
+vendorPhone,
+vendorEmail,
+typeOfLicense,
+licenseNumber,
+registeredWithAddedTax,
+LicenseFile,
+AddedTaxFile;
+var data={
+	vendorName,
+	 brandName,
+	vendorLocation,
+	vendorPhone,
+	vendorEmail,
+	typeOfLicense,
+	licenseNumber,
+	registeredWithAddedTax,
+	LicenseFile,
+	AddedTaxFile,
+}
 const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 const jwtSecretKey = process.env.SECRET;
 let mailTransporter =nodemailer.createTransport(
@@ -129,7 +152,7 @@ const NewVendorRequest=async(req,res)=>{
 try{
 
 
-	const data={
+	 data={
 		vendorName: `${req.body.vendorName}`,
 		brandName: `${req.body.brandName}`,
 		vendorLocation: `${req.body.vendorLocation}`,
@@ -148,6 +171,30 @@ try{
 	 {
 		return res.status(400).json({message:"your input not math the fields requirements"});
 	 }
+
+
+	 newRequestCode=Math.trunc(Math.random() * (9999 - 1000) + 1000);
+let mailDetails = {
+	from: 'abrar.purpose@gmail.com',
+	to: `${req.body.vendorEmail}`,
+	subject: 'Email Code',
+	text: `Hi this is your Code for the App ${newRequestCode}`
+}
+
+mailTransporter.sendMail(mailDetails,function (err, data) {
+	if (err) {
+		console.log('Error Occurs');
+		console.error(err);
+		res.status(500).json(`${err}`);
+	} else {
+		console.log(ID);
+		res.status(200).json({"message":'Code sent successfully to vendor '});
+	}
+});
+
+
+
+
 	//  const findVendor=await Vendor.findOne({"vendorEmail":req.body.VendorEmail});
 	 
 	//  if(findVendor)
@@ -156,30 +203,20 @@ try{
 	//  }
 	 
 
-	 const result=await Vendor.create(data);
-	   if (result) {
-		res.status(200).json({"message":'your request sent to admins',data:result});
-	
-		} else {
-			res.status(400).json("Error sending your request please try later ");
-		  
-		}     
-	
 
-	// const notificationData = {
-        
-    //     Description: "new vendor request", 
-    //     details: data, 
-    //   };
-	//   const response = await axios.post('https://webhook.site/ebb37a10-1f43-4bac-9100-03d89986e745',notificationData);
+
+
+
+	//  const result=await Vendor.create(data);
+	//    if (result) {
+	// 	res.status(200).json({"message":'your request sent to admins',data:result});
 	
-	//   if (response.status === 200) {
-	// 	res.status(200).json({"message":'your request sent to admins'});
-		  
 	// 	} else {
 	// 		res.status(400).json("Error sending your request please try later ");
 		  
 	// 	}     
+	
+   
 	
 }
 catch(e){
@@ -187,7 +224,34 @@ catch(e){
 } };
 
 
+const NewVendorValidateCode=async(req,res)=>{
+	var code=req.params.code;
+	try{
+	if(code==newRequestCode)
+		{
 
+
+	 const result=await Vendor.create(data);
+	   if (result) {
+		res.status(200).json({"message":'your request sent to admins',data:result});
+	
+		} else {
+			res.status(400).json("Error sending your request please try later ");
+		  
+		}
+			
+	}
+
+		else
+		{ 
+			res.status(400).json("the code is wrong");
+			
+		}
+	}
+	catch(err){
+		res.status(500).json(`${err}`);
+	}
+}
 
 
 
@@ -383,4 +447,4 @@ module.exports ={SendCode,ValidateCode
 	EditVendorRequest,
 	DeleteVendor,
 	DeleteLogo,
-	EditLogo};
+	EditLogo,NewVendorValidateCode};
