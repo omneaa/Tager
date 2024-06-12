@@ -1,7 +1,7 @@
 const express = require('express');
 const {storage} = require('../../utils/cloudinary');
 var router = express.Router();
-const {NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests}=require('../Controllers/Essay');
+const {NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests}=require('../Controllers/Admin');
 const multer=require('multer');
 const bodyParser = require('body-parser');
 const path = require('path');
