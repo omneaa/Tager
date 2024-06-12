@@ -1,6 +1,7 @@
 const express = require('express');
 const {storage} = require('../../utils/cloudinary');
 var router = express.Router();
+const {NewEssay,DeleteEssay,AllEssays,EditEssay}=require('../Controllers/Essay');
 const multer=require('multer');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -21,10 +22,10 @@ router.delete('/client/:id');
 router.get('/clients-num');
 router.get('/new-vendors-requests');
 router.get('/edit-vendors-request');
-router.post('/essay');
-router.get('/all-essays');
-router.delete('/essay/:id');
-router.patch('/essay/:id');
+router.post('/essay',NewEssay);
+router.get('/all-essays',AllEssays);
+router.delete('/essay/:id',DeleteEssay);
+router.patch('/essay/:id',EditEssay);
 router.post('/mail-clients');
 router.post('/mail-vendors');
 

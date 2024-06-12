@@ -1,10 +1,10 @@
 const mongoose=require('mongoose');
 const essaySchema=mongoose.Schema({
-    essayName:{
+    title:{
 type:String,
 
     },
-    essayBody:{
+    body:{
         type:String,
     
     },
