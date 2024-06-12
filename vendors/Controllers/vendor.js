@@ -338,6 +338,7 @@ const EditVendor=async(req,res)=>{
 
 					}
 				});
+				await EditRequest.findByIdAndDelete(req.params.Request_Id);
 			}
 			else{
 
@@ -359,6 +360,7 @@ const EditVendor=async(req,res)=>{
 		
 							}
 						});
+						await EditRequest.findByIdAndDelete(req.params.Request_Id);
 					}
 					
 			}
@@ -398,21 +400,7 @@ const EditVendorRequest=async(req,res)=>{
 		const result=await EditRequest.create(data);
 		return res.status(200).json({message:"your Request sent to admins" , data : result});;
 console.log(result);
-		// const notificationData = {
-			
-		// 	Description: "Edit vendor request", 
-		// 	AfterEdition: data, 
-		// 	BeforeEdition:await Vendor.findById(req.params.Id)
-		//   };
-		//   const response = await axios.post('https://webhook.site/ebb37a10-1f43-4bac-9100-03d89986e745',notificationData);
-		
-		//   if (response.status === 200) {
-		// 	res.status(200).json({"message":'your Edition request sent to admins'});
-			  
-		// 	} else {
-		// 		res.status(500).json("Error sending your Edition request please try later ");
-			  
-		// 	}     
+		  
 		
 	}
 	catch(e){
