@@ -8,7 +8,8 @@ async function auth(req,res,next){ // here make auth to control who can create t
         return res.status (404).json ({massage : "PLZ Login first "}) ; 
     }
     try{
-       var decoded =  await  promisify(jwt.verify)(authorization , process.env.SECRET)  // promisfy insteat of promise to handel error 
+       var decoded =  await  promisify(jwt.verify)(authorization , process.env.SECRET)
+         // promisfy insteat of promise to handel error 
     //    console.log(decoded) ; 
        req.id = decoded.id ; 
          next() ; 

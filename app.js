@@ -6,7 +6,8 @@ const port = 3000;
 const productRoutes = require('./products/Routes/product');
 const VendorRoutes=require('./vendors/Routes/vendor');
 const OrderRoutes= require('./orders/Routes/orders');
-const AdminRoutes=require('./admins/Routes/Admin')
+const AdminRoutes=require('./admins/Routes/Admin');
+const coponRoutes=require('./copons/Routes/copons');
 DB();
 // midelware 
 app.use(express.json())
@@ -17,6 +18,7 @@ app.use ('/products' , productRoutes)
 app.use('/vendor',VendorRoutes);
 app.use('/order' , OrderRoutes);
 app.use('/admin',AdminRoutes);
+app.use('/copons' ,coponRoutes)
 app.get('/', (req, res) => {
   res.send('Welcome to my server!');
 });
