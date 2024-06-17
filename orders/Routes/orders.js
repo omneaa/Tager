@@ -1,8 +1,8 @@
 const express = require('express');
 var router = express.Router();
 
-var {getallOrders,getTheDataSortedByDate} = require('../Controllers/orders');
+var getTheOrdersAccordingToFilters= require('../Controllers/orders');
 
-router.get('/getallorders', getallOrders);
-router.get('/sorteddata',getTheDataSortedByDate) ; 
+
+router.get('/sorteddata',getTheOrdersAccordingToFilters) ; 
 module.exports = router;
