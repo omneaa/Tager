@@ -3,7 +3,7 @@ const {storage} = require('../../utils/cloudinary');
 var router = express.Router();
 const {NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests 
 ,AddVendor,DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,
-DeleteAdmin
+DeleteAdmin,AdminLogin,AdminLogout
 }=require('../Controllers/Admin');
 const multer=require('multer');
 const bodyParser = require('body-parser');
@@ -30,9 +30,9 @@ router.get('/all-vendors',AllVendors);
 router.get('/all-admins',AllAdmins);
 router.get('/vendor/:id',VendorProfile);
 router.post('/new-client');
-router.post('/admin-login/:email/:password');
+router.post('/admin-login/:email/:password',AdminLogin);
 router.patch('/admin');
-router.post('/logout');
+router.post('/admin-logout',AdminLogout);
 router.delete('/admin/:id',DeleteAdmin);
 router.delete('/client/:id');
 router.get('/clients-num');
