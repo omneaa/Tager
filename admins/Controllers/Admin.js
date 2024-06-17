@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
 const Essay=require('../Models/Essay');
 const bcrypt = require('bcrypt');
+const jwt=require('jsonwebtoken');
 const Vendor=require('../../vendors/Models/vendor');
 const EditVendor=require('../../vendors/Models/Edit');
 const Admin=require('../Models/Admin')
@@ -15,6 +16,10 @@ let mailTransporter =nodemailer.createTransport(
 		}
 	}
 );
+let hashedPassword ;
+const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+const jwtSecretKey = process.env.SECRET;
+
 
 const NewEssay=async(req,res)=>{
     const essay={
@@ -119,7 +124,7 @@ for (const [key, value] of Object.entries(vendors)) {
 } 
 const AddNewAdmin = async(req,res) => {
 const {Email,Password}=req.body;
-const hashedPassword = await bcrypt.hash(Password, 10);
+ hashedPassword = await bcrypt.hash(Password, 10);
 const newadmin={
     Email:Email,
     Password:hashedPassword
@@ -143,6 +148,36 @@ const DeleteAdmin=async(req,res)=>{
   
 }
 
+const AdminLogin=async(req,res)=>{
+    let result=await Admin.find({"Email":req.params.email},{Password:1,_id:0});
+    const found = JSON.stringify(result);
+    if(found==="[]")
+     {
+        return res.status(400).json({"message":"this email not found"});
+     }
+        
+    for (const [key, value] of Object.entries(result)) {
+    let password=value.Password;
+    let isPasswordValid = await bcrypt.compareSync(req.params.password,password);
+    if(isPasswordValid){
+        const data = {
+            AdminId:result._id,
+            Email:result.Email
+        };
+        const token = jwt.sign(data, jwtSecretKey);
+        return res.status(200).json({"message":"ok","JWT":token});
+
+    }
+    else
+    {
+        return res.status(400).json({"message":"the password is wrong "});
+    }
+}
+}
+
+const AdminLogout=async(req,res)=>{
+
+}
 
 module.exports ={NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests,EditVendorRequests,AddVendor,
-    DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,DeleteAdmin};
+    DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,DeleteAdmin,AdminLogin,AdminLogout};
