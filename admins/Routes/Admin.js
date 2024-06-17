@@ -2,7 +2,8 @@ const express = require('express');
 const {storage} = require('../../utils/cloudinary');
 var router = express.Router();
 const {NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests 
-,AddVendor,DeleteVendor,AllVendors,VendorProfile
+,AddVendor,DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,
+DeleteAdmin
 }=require('../Controllers/Admin');
 const multer=require('multer');
 const bodyParser = require('body-parser');
@@ -22,16 +23,17 @@ const fileFilter = (req, file, cb) => {
   };
   const upload = multer({ storage, fileFilter});
 
-router.post('/new-admin/:email/:password');
+router.post('/new-admin',AddNewAdmin);
 router.post('/new-vendor',upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),AddVendor);
 router.delete('/vendor/:id',DeleteVendor);
 router.get('/all-vendors',AllVendors);
+router.get('/all-admins',AllAdmins);
 router.get('/vendor/:id',VendorProfile);
 router.post('/new-client');
 router.post('/admin-login/:email/:password');
 router.patch('/admin');
 router.post('/logout');
-router.delete('/admin/:id');
+router.delete('/admin/:id',DeleteAdmin);
 router.delete('/client/:id');
 router.get('/clients-num');
 router.get('/new-vendors-requests',NewVendorsRequests);
@@ -41,7 +43,7 @@ router.get('/all-essays',AllEssays);
 router.delete('/essay/:id',DeleteEssay);
 router.patch('/essay/:id',EditEssay);
 router.post('/mail-clients');
-router.post('/mail-vendors');
+router.post('/send-mail-vendors',SendMailToAllVendors);
 
 
 

@@ -1,8 +1,21 @@
 const dotenv = require('dotenv');
+const nodemailer = require('nodemailer');
 const Essay=require('../Models/Essay');
-//const EditRequest=require('../../Vendors/Models/Edit');
+const bcrypt = require('bcrypt');
 const Vendor=require('../../vendors/Models/vendor');
 const EditVendor=require('../../vendors/Models/Edit');
+const Admin=require('../Models/Admin')
+
+let mailTransporter =nodemailer.createTransport(
+	{
+		service: 'gmail',
+		auth: {
+			user: 'abrar.purpose@gmail.com',
+			pass: 'vjusorbiqjpjwhaz'
+		}
+	}
+);
+
 const NewEssay=async(req,res)=>{
     const essay={
         title:req.body.title,
@@ -68,15 +81,68 @@ const DeleteVendor=async(req,res)=>{
     const result= await Vendor.findByIdAndDelete(req.params.id);
     return res.status(200).json({ "message": "vendor deleted" });
 }
+
 const AllVendors=async(req,res)=>{
     
     const result=await Vendor.find({status:"accepted"});
     return res.status(200).json({ "message": "all vendors","result":result });
 
 }
+
 const VendorProfile=async(req,res)=>{
     const result=await Vendor.findById(req.params.id);
     return res.status(200).json({ "message": "vendor Profile","result":result });
 }
+
+
+const SendMailToAllVendors=async(req,res)=>{
+    let vendors=await Vendor.find({},{vendorEmail:1,_id:0});
+
+    let mailDetails = {
+        from: 'abrar.purpose@gmail.com',
+        subject: `${req.body.subject}`,
+        text: `${req.body.text}`
+    }
+for (const [key, value] of Object.entries(vendors)) {
+    mailDetails.to=`${value.vendorEmail}`
+    mailTransporter.sendMail(mailDetails,function (err, data) {
+        if (err) {
+            console.log('Error Occurs');
+            console.error(err);
+            res.status(500).json(`${err}`);
+        } else {
+            console.log(`email sent to ${value.vendorEmail}`);
+            res.status(200).json({"message":'Email sent successfully to vendor'});
+        }
+    });
+}
+} 
+const AddNewAdmin = async(req,res) => {
+const {Email,Password}=req.body;
+const hashedPassword = await bcrypt.hash(Password, 10);
+const newadmin={
+    Email:Email,
+    Password:hashedPassword
+}
+const result=await Admin.create(newadmin);
+return res.status(200).json({"message":"new admin added"});
+}
+
+
+const AllAdmins=async(req,res)=>{
+    const admins=await Admin.find({},{Email:1});
+    return res.status(200).json({"message":"all admins","result":`${admins}`});
+
+}
+
+
+const DeleteAdmin=async(req,res)=>{
+    const result=await Admin.findByIdAndDelete(req.params.id);
+    const admins=await Admin.find({},{Email:1});
+    return res.status(200).json({"message":"admin deleted","result":`${admins}`});
+  
+}
+
+
 module.exports ={NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests,EditVendorRequests,AddVendor,
-    DeleteVendor,AllVendors,VendorProfile};
+    DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,DeleteAdmin};
