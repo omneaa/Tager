@@ -4,7 +4,8 @@ var router = express.Router();
 const multer=require('multer')
 const path = require('path');
 const {auth} = require('../../middlewares/auth') ; 
-var {AddProduct, getAllproducts ,editProductStatus, addReview , getproductsbyvendorid ,Addchoose, getReviewsByVendorId }  = require('../Controllers/product');
+var {AddProduct, getAllproducts ,editProductStatus, addReview , getproductsbyvendorid ,
+  Addchoose, getReviewsByVendorId, getpendingproducts,numberofproductwhichisnotpending }  = require('../Controllers/product');
 const fileFilter = (req, file, cb) => {
     let ext = path.extname(file.originalname);
     // consloe(ext)
@@ -25,4 +26,7 @@ router.patch('/editstatus/:vendorEmail',editProductStatus);
 router.patch('/addreview' ,addReview) ;
 router.get('/products/:id',auth,getproductsbyvendorid)
 router.get('/reviews/:id',auth,getReviewsByVendorId)
+router.get('/pendingproducts',getpendingproducts)
+router.get('/numberofproducts' , numberofproductwhichisnotpending) ; 
+
 module.exports = router;

@@ -233,6 +233,29 @@ const getReviewsByVendorId = async (req, res) => {
   }
   
 };
+const getpendingproducts =async (req, res) => {
+  try {
+    const products =  await productModel.find({ status: "Pending" });
+    res.status(200).json(products);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Something went wrong on getting products",
+    });
+  }
+}
+const numberofproductwhichisnotpending = async (req, res) => {
+  try {
+    const products =  await productModel.find({ status: "Accepted" });
+    res.status(200).json({Number_of_products :products.length});
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Something went wrong on getting products",
+    });
+  }
+}
+
 module.exports = {
   AddProduct,
   getAllproducts,
@@ -241,4 +264,6 @@ module.exports = {
   getproductsbyvendorid,
   getReviewsByVendorId,
   Addchoose,
+  getpendingproducts,
+  numberofproductwhichisnotpending
 };

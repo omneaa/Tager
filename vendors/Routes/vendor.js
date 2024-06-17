@@ -8,7 +8,7 @@ const {auth} = require('../../middlewares/auth') ;
 bodyParser.json();
 var router = express.Router();
 const {ValidateCode,SendCode,NewVendor,NewVendorRequest,Logout,EditLogo,DeleteLogo,DeleteVendor,EditVendor,EditVendorRequest
-  ,NewVendorValidateCode
+  ,NewVendorValidateCode,getNumberofvendors
 }=require('../Controllers/vendor');
 var ID;
 
@@ -64,7 +64,7 @@ upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', max
 router.post('/edit-vendor-request/:Id',auth,upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),EditVendorRequest);
 
 router.post('/logout',auth,Logout);
-
+router.get('/numberofvendors' ,getNumberofvendors);
 module.exports = router;
 
 

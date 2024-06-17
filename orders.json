@@ -1,45 +1,158 @@
 [
-    {
-      "order_id": 1,
-      "customer_id": 2,
-      "order_date": "2024-05-21T10:20:00.000Z",
-      "order_status": "pending",
-      "order_total": 123.45,
-      "shipping_address": {
-        "street": "123 Main Street",
-        "city": "Anytown",
-        "state": "CA",
-        "zip": "12345"
+  {
+    "orderId": "ORD-1010",
+    "customerId": "CUST-7890",
+    "orderDate": "2024-06-08T11:30:00.000Z",
+    "status": "Delivered",
+    "products": [
+      {
+        "productId": "PROD-0002",
+        "productName": "Cozy Blanket",
+        "quantity": 2,
+        "price": 39.99
       },
-      "billing_address": {
-        "street": "456 Elm Street",
-        "city": "Anytown",
-        "state": "CA",
-        "zip": "12345"
+      {
+        "productId": "PROD-0003",
+        "productName": "Fitness Tracker",
+        "quantity": 1,
+        "price": 79.95
+      }
+    ]
+  },
+  {
+    "orderId": "ORD-1001",
+    "customerId": "CUST-1234",
+    "orderDate": "2024-06-17T14:00:00.000Z",
+    "status": "Pending",
+    "products": [
+      {
+        "productId": "PROD-0001",
+        "productName": "Cool Gadget",
+        "quantity": 2,
+        "price": 299.99
+      }
+    ]
+  },
+  {
+    "orderId": "ORD-1002",
+    "customerId": "CUST-5678",
+    "orderDate": "2024-06-16T12:30:00.000Z",
+    "status": "Shipped",
+    "products": [
+      {
+        "productId": "PROD-0002",
+        "productName": "Cozy Blanket",
+        "quantity": 1,
+        "price": 39.99
       },
-      "payment_method": "credit card",
-      "additional_information": ""
-    },
-    {
-      "order_id": 2,
-      "customer_id": 1, 
-      "order_date": "2024-05-15T15:30:00.000Z", 
-      "order_status": "shipped",
-      "order_total": 78.90,
-      "shipping_address": {
-        "street": "789 Maple Street",
-        "city": "Springfield",
-        "state": "NY",
-        "zip": "54321"
+      {
+        "productId": "PROD-0005",
+        "productName": "Travel Backpack",
+        "quantity": 1,
+        "price": 99.99
+      }
+    ]
+  },
+  {
+    "orderId": "ORD-1003",
+    "customerId": "CUST-9012",
+    "orderDate": "2024-06-15T10:15:00.000Z",
+    "status": "Delivered",
+    "products": [
+      {
+        "productId": "PROD-0003",
+        "productName": "Fitness Tracker",
+        "quantity": 3,
+        "price": 79.95
+      }
+    ]
+  },
+  {
+    "orderId": "ORD-1004",
+    "customerId": "CUST-3456",
+    "orderDate": "2024-06-14T08:45:00.000Z",
+    "status": "Cancelled",
+    "products": []
+  },
+  {
+    "orderId": "ORD-1005",
+    "customerId": "CUST-7890",
+    "orderDate": "2024-06-13T15:00:00.000Z",
+    "status": "Pending",
+    "products": [
+      {
+        "productId": "PROD-0004",
+        "productName": "Stylish Sunglasses",
+        "quantity": 2,
+        "price": 49.50
+      }
+    ]
+  },
+  {
+    "orderId": "ORD-1006",
+    "customerId": "CUST-1234", 
+    "orderDate": "2024-06-12T12:15:00.000Z",
+    "status": "Shipped",
+    "products": [
+      {
+        "productId": "PROD-0006",
+        "productName": "Comfy Sneakers",
+        "quantity": 1,
+        "price": 84.99
       },
-      "billing_address": {
-        "street": "500 Elm Street",
-        "city": "Anytown",
-        "state": "CA",
-        "zip": "1245"
+      {
+        "productId": "PROD-0007",
+        "productName": "Gourmet Coffee Beans",
+        "quantity": 2,
+        "price": 19.99
+      }
+    ]
+  },{
+    "orderId": "ORD-1007",
+    "customerId": "CUST-5678", 
+    "orderDate": "2024-06-11T09:45:00.000Z",
+    "status": "Delivered",
+    "products": [
+      {
+        "productId": "PROD-0001",
+        "productName": "Cool Gadget",
+        "quantity": 1,
+        "price": 299.99
       },
-      "payment_method": "debit card",
-      "additional_information": "Please hold for signature"
-    }
-  ]
-  
+      {
+        "productId": "PROD-0008",
+        "productName": "Watering Can",
+        "quantity": 2,
+        "price": 14.95
+      }
+    ]
+  },
+  {
+    "orderId": "ORD-1008",
+    "customerId": "CUST-0987",
+    "orderDate": "2024-06-10T17:00:00.000Z",
+    "status": "Pending",
+    "products": [
+      {
+        "productId": "PROD-0009",
+        "productName": "Wireless Headphones",
+        "quantity": 1,
+        "price": 129.99
+      }
+    ]
+  },
+  {
+    "orderId": "ORD-1009",
+    "customerId": "CUST-3456",
+    "orderDate": "2024-06-09T14:15:00.000Z",
+    "status": "Shipped",
+    "products": [
+      {
+        "productId": "PROD-0010",
+        "productName": "Notebook Set",
+        "quantity": 4,
+        "price": 24.95
+      }
+    ]
+  }
+]

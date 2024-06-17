@@ -425,7 +425,15 @@ const Logout=async(req,res)=>{
 	}
 
 }
-
+const getNumberofvendors=async(req,res)=>{
+	try{
+        const result=await Vendor.countDocuments();
+        res.status(200).json({message:"number of vendors",data:result});
+    }
+    catch(e){
+        res.status(400).json(e);
+    }
+}
 
 module.exports ={SendCode,ValidateCode
 	,NewVendor,
@@ -435,4 +443,6 @@ module.exports ={SendCode,ValidateCode
 	EditVendorRequest,
 	DeleteVendor,
 	DeleteLogo,
-	EditLogo,NewVendorValidateCode};
+	EditLogo,NewVendorValidateCode,
+	getNumberofvendors
+};
