@@ -466,7 +466,7 @@ const DeleteClient=async(req,res)=>{
     }
     const result=await Client.findByIdAndDelete(req.params.id);
     const clients=await Client.find({},{Email:1});
-    return res.status(200).json({"message":"admin deleted","new Clients ":`${clients}`});
+    return res.status(200).json({"message":"client deleted","new Clients ":`${clients}`});
 }
 catch(e){
     res.status(400).json({"error":e.error});

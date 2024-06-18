@@ -35,7 +35,7 @@ router.get('/all-admins/:adminId',auth,AllAdmins);
 router.get('/all-super-admins/:adminId',auth,AllSuperAdmins);
 router.get('/vendor/:id/:adminId',auth,VendorProfile);
 router.post('/new-client/:adminId',auth,AddClient);
-router.post('/admin-login/:email/:password',auth,AdminLogin);
+router.post('/admin-login/:email/:password',AdminLogin);
 router.post('/admin-logout',auth,AdminLogout);
 router.delete('/admin/:id/:adminId',auth,DeleteAdmin);
 router.delete('/super-admin/:id/:adminId',auth,DeleteSuperAdmin);
