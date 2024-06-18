@@ -1,5 +1,7 @@
 const productModel = require("../Models/product");
 const nodemailer = require("nodemailer");
+const{sendNotification }=require('../../utils/sendNotification');
+const axios = require('axios');
 let mailTransporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -83,7 +85,23 @@ const editProductStatus = async (req, res) => {
         return res.status(404).json({
           message: "Product not found",
         });
+  
       }
+      const notificationData = {
+
+        Description: "adding product status", 
+        details: `admin accepted adding your product : ${product}`, 
+      };
+    const response = await axios.post('https://webhook.site/24853ab5-45c1-47a8-bc3f-d1a7b51d2b32',notificationData);
+    // if (response.status === 200) {
+    // res.status(200).json({"message":'your request sent to admins'});
+
+    // } else {
+    //   res.status(400).json("Error sending your request please try later ");
+
+    // }     
+
+      
       let mailDetails = {
         from: "abrar.purpose@gmail.com",
         to: `${req.params.vendorEmail}`,
@@ -104,6 +122,14 @@ const editProductStatus = async (req, res) => {
       });
     } else {
       await productModel.findByIdAndDelete(productId);
+
+      const notificationData = {
+
+        Description: "adding product status", 
+        details: "admin rejected adding your product", 
+      };
+    const response = await axios.post('https://webhook.site/24853ab5-45c1-47a8-bc3f-d1a7b51d2b32',notificationData);
+
       let mailDetails = {
         from: "abrar.purpose@gmail.com",
         to: `${req.params.vendorEmail}`,

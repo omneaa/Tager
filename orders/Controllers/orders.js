@@ -29,8 +29,7 @@ const getTheOrdersAccordingToFilters = async (req, res) => {
       console.log(start);
       console.log(now);
       const orders = await ordersModel.find({},{
-        orderDate: {
-          $gte: start,
+        orderDate: { $gte: start,
           $lte: now,
         },
       });

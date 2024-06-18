@@ -3,12 +3,14 @@ const {storage} = require('../../utils/cloudinary');
 var router = express.Router();
 const {NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests 
 ,AddVendor,DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,
-DeleteAdmin,AdminLogin,AdminLogout
+DeleteAdmin,AdminLogin,AdminLogout,AddClient,DeleteClient,AllClients,SendMailToAllClients,ClientsNum,
+AddNewSuperAdmin,AllSuperAdmins,DeleteSuperAdmin
 }=require('../Controllers/Admin');
 const multer=require('multer');
 const bodyParser = require('body-parser');
 const path = require('path');
 const {auth} = require('../../middlewares/auth') ;
+
 bodyParser.json();
 var router = express.Router();
 
@@ -23,27 +25,30 @@ const fileFilter = (req, file, cb) => {
   };
   const upload = multer({ storage, fileFilter});
 
-router.post('/new-admin',AddNewAdmin);
-router.post('/new-vendor',upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),AddVendor);
-router.delete('/vendor/:id',DeleteVendor);
-router.get('/all-vendors',AllVendors);
-router.get('/all-admins',AllAdmins);
-router.get('/vendor/:id',VendorProfile);
-router.post('/new-client');
-router.post('/admin-login/:email/:password',AdminLogin);
-router.patch('/admin');
-router.post('/admin-logout',AdminLogout);
-router.delete('/admin/:id',DeleteAdmin);
-router.delete('/client/:id');
-router.get('/clients-num');
-router.get('/new-vendors-requests',NewVendorsRequests);
-router.get('/edit-vendors-requests',EditVendorRequests);
-router.post('/essay',NewEssay);
-router.get('/all-essays',AllEssays);
-router.delete('/essay/:id',DeleteEssay);
-router.patch('/essay/:id',EditEssay);
-router.post('/mail-clients');
-router.post('/send-mail-vendors',SendMailToAllVendors);
+router.post('/new-admin/:adminId',auth,AddNewAdmin);
+router.post('/new-super-admin/:adminId',auth,AddNewSuperAdmin);
+router.post('/new-vendor/:adminId',auth,upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),AddVendor);
+router.delete('/vendor/:id/:adminId',auth,DeleteVendor);
+router.get('/all-vendors/:adminId',auth,AllVendors);
+router.get('/all-clients/:adminId',auth,AllClients);
+router.get('/all-admins/:adminId',auth,AllAdmins);
+router.get('/all-super-admins/:adminId',auth,AllSuperAdmins);
+router.get('/vendor/:id/:adminId',auth,VendorProfile);
+router.post('/new-client/:adminId',auth,AddClient);
+router.post('/admin-login/:email/:password',auth,AdminLogin);
+router.post('/admin-logout',auth,AdminLogout);
+router.delete('/admin/:id/:adminId',auth,DeleteAdmin);
+router.delete('/super-admin/:id/:adminId',auth,DeleteSuperAdmin);
+router.delete('/client/:id/:adminId',auth,DeleteClient);
+router.get('/clients-num/:adminId',auth,ClientsNum);
+router.get('/new-vendors-requests/:adminId',auth,NewVendorsRequests);
+router.get('/edit-vendors-requests/:adminId',auth,EditVendorRequests);
+router.post('/essay/:adminId',auth,NewEssay);
+router.get('/all-essays/:adminId',auth,AllEssays);
+router.delete('/essay/:id/:adminId',auth,DeleteEssay);
+router.patch('/essay/:id/:adminId',auth,EditEssay);
+router.post('/send-mail-clients/:adminId',auth,SendMailToAllClients);
+router.post('/send-mail-vendors/:adminId',auth,SendMailToAllVendors);
 
 
 
