@@ -4,7 +4,7 @@ var router = express.Router();
 const {NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests 
 ,AddVendor,DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,
 DeleteAdmin,AdminLogin,AdminLogout,AddClient,DeleteClient,AllClients,SendMailToAllClients,ClientsNum,
-AddNewSuperAdmin,AllSuperAdmins,DeleteSuperAdmin
+AddNewSuperAdmin,AllSuperAdmins,DeleteSuperAdmin,EditAdmin,EditSuperAdmin
 }=require('../Controllers/Admin');
 const multer=require('multer');
 const bodyParser = require('body-parser');
@@ -49,7 +49,8 @@ router.delete('/essay/:id/:adminId',auth,DeleteEssay);
 router.patch('/essay/:id/:adminId',auth,EditEssay);
 router.post('/send-mail-clients/:adminId',auth,SendMailToAllClients);
 router.post('/send-mail-vendors/:adminId',auth,SendMailToAllVendors);
-
+router.patch('/edit-admin/:adminId',auth,EditAdmin);
+router.patch('/edit-superAdmin/:adminId',auth,EditSuperAdmin);
 
 
 

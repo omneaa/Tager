@@ -394,7 +394,7 @@ catch(e){
 
 const AdminLogin=async(req,res)=>{
     try{
-    let result=await Admin.find({"Email":req.params.email},{Password:1,_id:0});
+    let result=await Admin.find({"Email":req.params.email},{Password:1,_id:1});
     const found = JSON.stringify(result);
     if(found==="[]")
      {
@@ -403,6 +403,7 @@ const AdminLogin=async(req,res)=>{
         
     for (const [key, value] of Object.entries(result)) {
     let password=value.Password;
+    let ID=value._id;
     let isPasswordValid = await bcrypt.compareSync(req.params.password,password);
     if(isPasswordValid){
         const data = {
@@ -410,7 +411,7 @@ const AdminLogin=async(req,res)=>{
             Email:result.Email
         };
         const token = jwt.sign(data, jwtSecretKey);
-        return res.status(200).json({"message":"ok","JWT":token});
+        return res.status(200).json({"message":"ok","JWT":token,"AdminID":ID});
 
     }
     else
@@ -477,6 +478,7 @@ catch(e){
 
 
 
+
 const AllClients=async(req,res)=>{
     try{
     const isAdmin=await Admin.findById(req.params.adminId);
@@ -538,8 +540,37 @@ catch(e){
 }
 }
 
+const EditAdmin=async (req,res)=>{
+    try{
+    const isAdmin=await Admin.findById(req.params.adminId);
+    
+    if(!isAdmin){
+        return res.status(400).json({ "message": "not allowed onlly admins allowed"});
+    }
+    const result=await Admin.findByIdAndUpdate(req.params.adminId,{"Email":req.body.Email,"Password":req.body.Password});
+    return res.status(200).json({ "message": "Admin profile updated"});
+}catch(e){
+    res.status(400).json({"error":e.error});
+}
+}
+
+
+
+const EditSuperAdmin=async (req,res)=>{
+    try{
+    
+    const isSuperAdmin=await SuperAdmin.findById(req.params.adminId);
+    if( !isSuperAdmin){
+        return res.status(400).json({ "message": "not allowed onlly super admins allowed"});
+    }
+    const result=await SuperAdmin.findByIdAndUpdate(req.params.adminId,{"Email":req.body.Email,"Password":req.body.Passwrd});
+    return res.status(200).json({ "message": "super admin profile updated"});
+}catch(e){
+    res.status(400).json({"error":e.error});
+}
+}
 
 module.exports ={NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests,EditVendorRequests,AddVendor,
     DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,DeleteAdmin,AdminLogin,AdminLogout,
-    AddClient,DeleteClient,AllClients,SendMailToAllClients,ClientsNum,AddNewSuperAdmin,AllSuperAdmins,DeleteSuperAdmin
+    AddClient,DeleteClient,AllClients,SendMailToAllClients,ClientsNum,AddNewSuperAdmin,AllSuperAdmins,DeleteSuperAdmin,EditAdmin,EditSuperAdmin
 };
