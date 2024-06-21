@@ -9,6 +9,7 @@ const OrderRoutes= require('./orders/Routes/orders');
 const AdminRoutes=require('./admins/Routes/Admin');
 const coponRoutes=require('./copons/Routes/copons');
 const ClientRoutes=require('./clients/Routes/client');
+const MessageRoutes=require('./message/Routes/message');
 DB();
 // midelware 
 app.use(express.json())
@@ -19,8 +20,9 @@ app.use ('/products' , productRoutes)
 app.use('/vendor',VendorRoutes);
 app.use('/order' , OrderRoutes);
 app.use('/admin',AdminRoutes);
-app.use('/copons' ,coponRoutes)
-app.use('/client' ,ClientRoutes)
+app.use('/copons' ,coponRoutes);
+app.use('/client' ,ClientRoutes);
+app.use('/message', MessageRoutes);
 app.get('/', (req, res) => {
   res.send('Welcome to my server!');
 });
