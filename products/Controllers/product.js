@@ -49,7 +49,7 @@ const AddProduct = async (req, res) => {
     console.error(error);
     res.status(400).json({
       message: "Add Product Failed",
-      error: error,
+      error: error.message,
     });
   }
 };

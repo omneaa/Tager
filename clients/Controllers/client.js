@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const Client=require('../../clients/Models/client');
+const Product=require('../../products/Models/product')
 
 let hashedPassword ;
 const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
@@ -43,5 +44,20 @@ const login=async(req,res)=> {
 const logout=async(req,res)=>{
     return res.status(200).json({"message":"ok"});
 }
+const viewProductByProductId=async(req,res)=>{
+const result= await Product.findById(req.params.id);
+return res.status(200).json({"message":"done","product":result});
+}
 
-module.exports ={login,logout};
+
+
+const ViewLowestPriceProducts=async(req,res)=>{
+const result= await Product.find().sort({price:1});
+return res.status(200).json({"message":"lowest price products","product":result});
+}
+
+const ViewHighestPriceProducts=async(req,res)=>{
+    const result= await Product.find().sort({price:-1});
+    return res.status(200).json({"message":"highest price products","product":result});
+    }
+module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts};

@@ -21,7 +21,12 @@ reqire:true
             type:String,
             reqire:true,
             
-            }
+            },
+            FavouriteProducts:[{
+                Product:{
+                    type:String
+                }
+            }]
        
 })
 const ClientModel=mongoose.model('Client',ClientSchema);
