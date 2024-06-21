@@ -60,4 +60,10 @@ const ViewHighestPriceProducts=async(req,res)=>{
     const result= await Product.find().sort({price:-1});
     return res.status(200).json({"message":"highest price products","product":result});
     }
-module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts};
+
+
+const ViewHighRatedProducts=async(req,res)=>{
+    const result=await Product.find().sort({averageRating:-1})
+    return res.status(200).json({"message":"high rated products","products":result});
+}
+module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts};

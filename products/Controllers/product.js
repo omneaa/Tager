@@ -56,7 +56,7 @@ const AddProduct = async (req, res) => {
 
 const getAllproducts = async (req, res) => {
   try {
-    let products = await productModel.find();
+    let products = await productModel.find({"status":"Accepted"});
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json({
@@ -181,7 +181,7 @@ const addReview = async (req, res) => {
       productId,
       { $set: { "totalRating":totalRating,"averageRating":averageRating}},{ new: true }
     );
-    //console.log(updated);
+    
     res
       .status(201)
       .json({ message: "Review added successfully", data: updated});
