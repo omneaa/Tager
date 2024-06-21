@@ -49,7 +49,36 @@ reqire:true
         status:{
  type:String,
  default:"pending"
-        }
+        },
+        reviews: [{
+            userId: {
+              type: String,
+            },
+            rating: {
+              type: Number,
+              min: 1,
+              max: 5,
+            },
+            reviewText: {
+              type: String,
+            },
+            createdAt: {
+              type: Date,
+              default: Date.now,
+            },
+            updatedAt: {
+              type: Date,
+              default: Date.now,
+            }
+          }],
+          totalRating:{
+            type:Number,
+            default:0,
+          },
+          averageRating:{
+            type:Number,
+            default:0
+          }
 })
 const vendorModel=mongoose.model('vendor',vendorSchema);
 module.exports = vendorModel;

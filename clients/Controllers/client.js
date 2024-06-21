@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const Client=require('../../clients/Models/client');
 const Product=require('../../products/Models/product')
-
+const Vendor=require('../../vendors/Models/vendor');
 let hashedPassword ;
 const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 const jwtSecretKey = process.env.SECRET;
@@ -66,4 +66,64 @@ const ViewHighRatedProducts=async(req,res)=>{
     const result=await Product.find().sort({averageRating:-1})
     return res.status(200).json({"message":"high rated products","products":result});
 }
-module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts};
+
+
+const AddVendorReview=async(req,res)=>{
+    try {
+        const { vendorId, userId, rating, reviewText } = req.body;
+         const vendor=await Vendor.findById(vendorId);
+         const totalRating = Number(vendor.totalRating)+Number(rating);
+         const averageRating = Number(totalRating)/((vendor.reviews.length+1));
+        const newReview = {
+          userId,
+          rating,
+          reviewText, 
+        };
+         
+        const updatedReviews = await Vendor.findByIdAndUpdate(
+          vendorId,
+          { $push: { reviews: newReview }},{ new: true }
+        );
+    
+        const updated = await Vendor.findByIdAndUpdate(
+          vendorId,
+          { $set: { "totalRating":totalRating,"averageRating":averageRating}},{ new: true }
+        );
+        
+        res
+          .status(201)
+          .json({ message: "Review added successfully to vendor", data: updated});
+      } catch (error) {
+        console.error(error);
+        res
+          .status(400)
+          .json({ message: "Failed to add review", error: error.message });
+      }
+}
+
+
+
+const ViewAllVendorReviews=async(req,res)=>{
+    try {
+        const vendorId = req.params.id;
+        const vendorReviews = await Vendor.findById(vendorId,{reviews:1,averageRating:1});
+    
+        return res
+          .status(200)
+          .json({
+            message: "Product reviews retrieved successfully",
+            data: vendorReviews,
+          });
+      } catch (error) {
+        console.error(error);
+        return res
+          .status(500)
+          .json({
+            message: "Failed to retrieve product reviews",
+            error: error.message,
+          });
+      }
+      
+}
+module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
+    ,ViewAllVendorReviews};

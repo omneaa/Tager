@@ -1,7 +1,8 @@
 const express = require('express');
 const {storage} = require('../../utils/cloudinary');
 var router = express.Router();
-const { login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts
+const { login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview,
+    ViewAllVendorReviews
 }=require('../Controllers/client');
 const multer=require('multer');
 const bodyParser = require('body-parser');
@@ -20,6 +21,11 @@ router.get('/The-highest-price',ViewHighestPriceProducts);
 router.get('/high-rated-products',ViewHighRatedProducts);
 router.post('/search-by-description');
 router.post('/report');
+router.patch('/add-vendor-review',auth,AddVendorReview);
+router.get('/view-vendor-reviews/:id',ViewAllVendorReviews);
+
+
+
 
 
 module.exports = router;

@@ -168,10 +168,7 @@ const addReview = async (req, res) => {
       rating,
       reviewText, 
     };
-    
-    
-
-    console.log(product.reviews.length);
+     
     const updatedReviews = await productModel.findByIdAndUpdate(
       productId,
       { $push: { reviews: newReview }},{ new: true }
