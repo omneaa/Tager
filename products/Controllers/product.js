@@ -156,22 +156,35 @@ const editProductStatus = async (req, res) => {
     });
   }
 };
+
 const addReview = async (req, res) => {
   try {
     const { productId, userId, rating, reviewText } = req.body;
+     const product=await productModel.findById(productId);
+     const totalRating = Number(product.totalRating)+Number(rating);
+     const averageRating = Number(totalRating)/((product.reviews.length+1));
     const newReview = {
       userId,
       rating,
-      reviewText,
+      reviewText, 
     };
+    
+    
+
+    console.log(product.reviews.length);
     const updatedReviews = await productModel.findByIdAndUpdate(
       productId,
-      { $push: { reviews: newReview } },
-      { new: true }
+      { $push: { reviews: newReview }},{ new: true }
     );
+
+    const updated = await productModel.findByIdAndUpdate(
+      productId,
+      { $set: { "totalRating":totalRating,"averageRating":averageRating}},{ new: true }
+    );
+    //console.log(updated);
     res
       .status(201)
-      .json({ message: "Review added successfully", data: newReview });
+      .json({ message: "Review added successfully", data: updated});
   } catch (error) {
     console.error(error);
     res
@@ -179,6 +192,8 @@ const addReview = async (req, res) => {
       .json({ message: "Failed to add review", error: error.message });
   }
 };
+
+
 const Addchoose = async (req, res) => {
   try {
     const productId = req.params.id;

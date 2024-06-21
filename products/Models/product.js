@@ -101,6 +101,14 @@ const productSchema = mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now,
+  },
+  totalRating:{
+    type:Number,
+    default:0,
+  },
+  averageRating:{
+    type:Number,
+    default:0
   }
 
 })
