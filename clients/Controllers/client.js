@@ -125,5 +125,27 @@ const ViewAllVendorReviews=async(req,res)=>{
       }
       
 }
+const IncreaseProductViews=async(req,res)=>{
+  try{
+  const product=await Product.findById(req.params.id);
+  const views=Number(product.views)+1;
+  const result=await Product.findByIdAndUpdate(req.params.id,{"views":views},{new:true});
+  return res.status(200).json({ message: "views increased", data:result});
+  }
+  catch(e){
+    return res.status(500).json({ message: "Error ", error: error.message});
+  }
+}
+const ViewTrendingProducts=async(req,res)=>{
+  try{
+const result=await Product.find().sort({"views":-1});
+return res.status(200).json({ message: "trending views", products:result});
+  }
+  catch(e)
+  {
+    return res.status(500).json({ message: "Error ", error: error.message});
+  }
+}
+
 module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
-    ,ViewAllVendorReviews};
+    ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts};

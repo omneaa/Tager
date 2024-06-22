@@ -2,7 +2,7 @@ const express = require('express');
 const {storage} = require('../../utils/cloudinary');
 var router = express.Router();
 const { login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview,
-    ViewAllVendorReviews
+    ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts
 }=require('../Controllers/client');
 const multer=require('multer');
 const bodyParser = require('body-parser');
@@ -23,8 +23,8 @@ router.post('/search-by-description');
 router.post('/report');
 router.patch('/add-vendor-review',auth,AddVendorReview);
 router.get('/view-vendor-reviews/:id',ViewAllVendorReviews);
-
-
+router.patch('/increase-product-views/:id',IncreaseProductViews);
+router.get('/all-trending-products',ViewTrendingProducts);
 
 
 
