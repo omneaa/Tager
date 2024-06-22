@@ -1,5 +1,6 @@
 const express=require('express');
-const DB=require('./config/database')
+const DB=require('./config/database');
+const cors = require("cors") ;
 const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
@@ -14,7 +15,11 @@ DB();
 // midelware 
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use (cors({
+  origin: "*",
+  methods: ["GET", "POST"],
+}  
+))
 // app.use(bodyParser.json());
 app.use ('/products' , productRoutes)
 app.use('/vendor',VendorRoutes);
