@@ -12,17 +12,17 @@ reqire:true
         type:Number,
         reqire:true
     },
-       Email:{
+    Email:{
         type:String,
         reqire:true,
         
         },
-        Password:{
+    Password:{
             type:String,
             reqire:true,
             
             },
-            FavouriteProducts:[{
+    FavouriteProducts:[{
                 Product:{
                     type:String
                 }
