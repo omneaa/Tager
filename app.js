@@ -17,7 +17,6 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use (cors({
   origin: "*",
-  methods: ["GET", "POST"],
 }  
 ))
 // app.use(bodyParser.json());
