@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const Client=require('../../clients/Models/client');
+const Followers=require('../../clients/Models/followers');
 const Product=require('../../products/Models/product')
 const Vendor=require('../../vendors/Models/vendor');
 let hashedPassword ;
@@ -155,7 +156,7 @@ const result=await Product.find({ description: { $regex: regex } ,status:"Accept
 }
 
 catch(e){
-  return res.status(500).json({ message: "Error ", error: error.message});
+  return res.status(500).json({ message: "Error ", error: e.message});
 }
 }
 
@@ -170,7 +171,7 @@ const AddFavouriteProduct=async(req,res)=>{
   return res.status(200).json({ message: "product added to your favourite products",result:result});
 }
 catch(e){
-  console.log(e.error);
+  return res.status(500).json({ message: "Error ", error: e.message});
 }
 
 }
@@ -186,7 +187,7 @@ const DeleteFavouriteProduct=async(req,res)=>{
   return res.status(200).json({ message: "product deleted from your favourite products",result:result});
 }
 catch(e){
-  console.log(e.error);
+  return res.status(500).json({ message: "Error ", error: e.message});
 }
 
 }
@@ -211,6 +212,44 @@ const GetAllFavouriteProducts=async(req,res)=>{
 }
 
 
+const FollowVendor=async(req,res)=>{
+  try{
+  const {vendorId}=req.params;
+const ID={
+  vendorId
+}
+
+let result=await Followers.findOneAndUpdate({"ClientId":req.params.clientId},{$push:{Followers:{ VendorId: vendorId }}},{new:true});
+if(!result){
+   return result=await Followers.create({"ClientId":req.params.clientId},{$push:{Followers:{ VendorId: vendorId }}});
+}
+else{
+return res.status(200).json({ message: "now you follow new vendor",result:result});
+}
+  }
+  catch(e){
+    return res.status(500).json({ message: "Error ", error: e.message});
+  }
+}
+
+const UnfollowVendor=async(req,res)=>{
+  try{
+    const {vendorId}=req.params;
+    const ID={
+      vendorId
+    }                                                                      
+  const result=await Followers.findOneAndUpdate({"ClientId":req.params.clientId},{$pull:{Followers:{ VendorId:vendorId }}},{new:true});
+
+  return res.status(200).json({ message: "now you unfollwed vendor",result:result});
+}
+catch(e){
+  return res.status(500).json({ message: "Error ", error: e.message});
+}
+
+}
+
+
 module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
-    ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct,DeleteFavouriteProduct,GetAllFavouriteProducts
+    ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct,DeleteFavouriteProduct,GetAllFavouriteProducts,
+    FollowVendor,UnfollowVendor
   };
