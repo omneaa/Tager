@@ -2,7 +2,8 @@ const express = require('express');
 const {storage} = require('../../utils/cloudinary');
 var router = express.Router();
 const { login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview,
-    ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct
+    ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct,DeleteFavouriteProduct,
+    GetAllFavouriteProducts
 }=require('../Controllers/client');
 const multer=require('multer');
 const bodyParser = require('body-parser');
@@ -26,8 +27,8 @@ router.patch('/increase-product-views/:id',IncreaseProductViews);
 router.get('/all-trending-products',ViewTrendingProducts);
 
 router.patch('/add-favourite-product/:productId/:clientId',AddFavouriteProduct);
-router.patch('/remove-favourite-product/:productId');
-router.get('/all-favourite-products');
+router.delete('/delete-favourite-product/:productId/:clientId',DeleteFavouriteProduct);
+router.get('/all-favourite-products/:clientId',GetAllFavouriteProducts);
 
 
 module.exports = router;

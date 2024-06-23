@@ -165,9 +165,25 @@ const AddFavouriteProduct=async(req,res)=>{
     const ID={
       productId
     }
-   result=await Client.findByIdAndUpdate(req.params.clientId,{$push:{FavouriteProducts:ID}});
+   const result=await Client.findByIdAndUpdate(req.params.clientId,{$push:{FavouriteProducts:{ ProductId: productId }}},{new:true});
 
-  return res.status(200).json({ message: "product added to your favourite products"});
+  return res.status(200).json({ message: "product added to your favourite products",result:result});
+}
+catch(e){
+  console.log(e.error);
+}
+
+}
+
+const DeleteFavouriteProduct=async(req,res)=>{
+  try{
+    const {productId}=req.params;
+    const ID={
+      productId
+    }                                                                      
+  const result=await Client.findByIdAndUpdate(req.params.clientId,{$pull:{FavouriteProducts:{ ProductId: productId }}},{new:true});
+
+  return res.status(200).json({ message: "product deleted from your favourite products",result:result});
 }
 catch(e){
   console.log(e.error);
@@ -176,5 +192,25 @@ catch(e){
 }
 
 
+//not complete
+
+const GetAllFavouriteProducts=async(req,res)=>{
+  const result={
+
+  }
+  let i=0;
+  const data=await Client.findById(req.params.clientId,{FavouriteProducts:1,_id:0});
+  for (const [key, value] of Object.entries(data)) {
+    //const product=await Product.findById(value.FavouriteProducts[0].ProductId);
+    console.log(value);
+
+  }
+
+
+  return res.status(200).json({ message: "products",result:found});
+}
+
+
 module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
-    ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct};
+    ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct,DeleteFavouriteProduct,GetAllFavouriteProducts
+  };
