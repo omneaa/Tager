@@ -23,8 +23,8 @@ reqire:true
             
             },
     FavouriteProducts:[{
-                Product:{
-                    type:String
+                ProductId:{
+                type:String
                 }
             }]
        

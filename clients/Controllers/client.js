@@ -147,5 +147,34 @@ return res.status(200).json({ message: "trending views", products:result});
   }
 }
 
+const SearchByDescription=async(req,res)=>{
+ try{
+ const regex = new RegExp(req.params.description);
+const result=await Product.find({ description: { $regex: regex } ,status:"Accepted"});
+  return res.status(200).json({ message: "products with description", products:result});
+}
+
+catch(e){
+  return res.status(500).json({ message: "Error ", error: error.message});
+}
+}
+
+const AddFavouriteProduct=async(req,res)=>{
+  try{
+    const {productId}=req.params;
+    const ID={
+      productId
+    }
+   result=await Client.findByIdAndUpdate(req.params.clientId,{$push:{FavouriteProducts:ID}});
+
+  return res.status(200).json({ message: "product added to your favourite products"});
+}
+catch(e){
+  console.log(e.error);
+}
+
+}
+
+
 module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
-    ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts};
+    ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct};
