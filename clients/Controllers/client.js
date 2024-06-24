@@ -193,23 +193,30 @@ catch(e){
 }
 
 
-//not complete
 
-const GetAllFavouriteProducts=async(req,res)=>{
-  const result={
 
+const GetAllFavouriteProducts = async (req, res) => {
+  const clientId = req.params.clientId;
+  const productDetails = [];
+  try {
+    const data = await Client.findById(clientId,{ FavouriteProducts: 1, _id: 0 });
+    if (!data) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+    const productIds = data.FavouriteProducts.map(product => product.ProductId);
+    for (const productId of productIds) {
+      let product=await Product.findById(productId,{__v:0});
+      productDetails.push(product);
+    }
+    return res.status(200).json({
+      message: "your favourite products",productDetails,
+    });
+  } catch (err) {
+    console.error('Error fetching client or favorite products:', err);
+    return res.status(500).json({ message: 'Internal server error' });
   }
-  let i=0;
-  const data=await Client.findById(req.params.clientId,{FavouriteProducts:1,_id:0});
-  for (const [key, value] of Object.entries(data)) {
-    //const product=await Product.findById(value.FavouriteProducts[0].ProductId);
-    console.log(value);
+};
 
-  }
-
-
-  return res.status(200).json({ message: "products",result:found});
-}
 
 
 const FollowVendor=async(req,res)=>{
