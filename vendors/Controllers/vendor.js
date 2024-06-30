@@ -7,6 +7,7 @@ const{sendNotification }=require('../../utils/sendNotification');
 const Vendor=require('../Models/vendor');
 const EditRequest=require('../Models/Edit');
 const axios = require('axios');
+const httpRequest = require('https');
 var ID;
 var newRequestCode;
 var vendorName,
@@ -73,7 +74,7 @@ const ValidateCode=async(req,res)=>{
 
 
 			const jwtSecretKey = process.env.SECRET;
-			const user=await Vendor.findOne({VendorEmail:req.email});
+			const user=await Vendor.findOne({VendorEmail:req.params.vendorEmail});
 			const data = {
 				time: Date(),
 				userId: user._id,
@@ -187,7 +188,7 @@ mailTransporter.sendMail(mailDetails,function (err, data) {
 		console.error(err);
 		res.status(500).json(`${err}`);
 	} else {
-		console.log(ID);
+		console.log(newRequestCode);
 		res.status(200).json({"message":'Code sent successfully to vendor '});
 	}
 });
@@ -435,6 +436,42 @@ const getNumberofvendors=async(req,res)=>{
     }
 }
 
+
+const MessageOtp=async(req,res)=>{
+const options = {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+};
+
+const data = `{
+  "userName": "Gomalwabas@gmail.com",
+  "numbers": "01099805381",
+  "userSender": "tager",
+  "apiKey": "1e9f382946e85ae594a084fab01413f7",
+  "msg": "hi"
+}`;
+
+const request = httpRequest.request('https://www.msegat.com/gw/sendsms.php', options, response => {
+  console.log('Status', response.statusCode);
+  console.log('Headers', response.headers);
+  let responseData = '';
+
+  response.on('data', dataChunk => {
+    responseData += dataChunk;
+  });
+  response.on('end', () => {
+    console.log('Response: ', responseData)
+  });
+});
+
+request.on('error', error => console.log('ERROR', error));
+
+request.write(data);
+request.end();
+}
+
 module.exports ={SendCode,ValidateCode
 	,NewVendor,
 	NewVendorRequest,
@@ -444,5 +481,6 @@ module.exports ={SendCode,ValidateCode
 	DeleteVendor,
 	DeleteLogo,
 	EditLogo,NewVendorValidateCode,
-	getNumberofvendors
+	getNumberofvendors,
+	MessageOtp
 };
