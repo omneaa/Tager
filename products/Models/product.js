@@ -9,9 +9,6 @@ const productSchema = mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'vendor',
     required: true,
-    // type: String,
-    
-    // required: true,
   },
   name: {
     type: String,
@@ -94,14 +91,7 @@ const productSchema = mongoose.Schema({
       default: Date.now,
     }
   }],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+ 
   totalRating:{
     type:Number,
     default:0,
@@ -114,8 +104,24 @@ const productSchema = mongoose.Schema({
     type:Number,
     default:0 
   }
+  , 
+  comments: [{
+    client: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref :'Client', 
+			required: true,
+    },
+    comment: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    }
+  }],
 
-})
+} , { timestamps: true })
 
 var productModel = mongoose.model('products', productSchema)
 module.exports = productModel;

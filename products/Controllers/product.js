@@ -189,7 +189,36 @@ const addReview = async (req, res) => {
       .json({ message: "Failed to add review", error: error.message });
   }
 };
+const addComment = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const {client , comment} = req.body;
+     const product=await productModel.findById(productId);
+    const newComment = {
+      client , 
+      comment 
+    };
+     
+    const updatedComments = await productModel.findByIdAndUpdate(
+      productId,
+      { $push: { comments: newComment }},{ new: true }
+    );
 
+    const updated = await productModel.findByIdAndUpdate(
+      productId,
+     { new: true }
+    );
+    
+    res
+      .status(201)
+      .json({ message: "Comment added successfully", data: updated});
+  } catch (error) {
+    console.error(error);
+    res
+      .status(400)
+      .json({ message: "Failed to add Comment", error: error.message });
+  }
+};
 
 const Addchoose = async (req, res) => {
   try {
@@ -293,6 +322,17 @@ const numberofproductwhichisnotpending = async (req, res) => {
     });
   }
 }
+const getproductSortedbyCreatedDate = async (req, res) =>{
+  try {
+    const products =  await productModel.find().sort({ createdAt: -1 });
+    res.status(200).json(products);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Something went wrong on getting products",
+    });
+  }
+}
 
 module.exports = {
   AddProduct,
@@ -303,5 +343,7 @@ module.exports = {
   getReviewsByVendorId,
   Addchoose,
   getpendingproducts,
-  numberofproductwhichisnotpending
+  numberofproductwhichisnotpending,
+  addComment,
+  getproductSortedbyCreatedDate
 };

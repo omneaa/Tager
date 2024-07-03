@@ -5,7 +5,8 @@ const multer=require('multer')
 const path = require('path');
 const {auth} = require('../../middlewares/auth') ; 
 var {AddProduct, getAllproducts ,editProductStatus, addReview , getproductsbyvendorid ,
-  Addchoose, getReviewsByVendorId, getpendingproducts,numberofproductwhichisnotpending }  = require('../Controllers/product');
+  Addchoose, getReviewsByVendorId, getpendingproducts,numberofproductwhichisnotpending,
+  addComment, getproductSortedbyCreatedDate }  = require('../Controllers/product');
 const fileFilter = (req, file, cb) => {
     let ext = path.extname(file.originalname);
     // consloe(ext)
@@ -28,5 +29,6 @@ router.get('/products/:id',auth,getproductsbyvendorid)
 router.get('/reviews/:id',auth,getReviewsByVendorId)
 router.get('/pendingproducts',getpendingproducts)
 router.get('/numberofproducts' , numberofproductwhichisnotpending) ; 
-
+router.patch ('/comment/:id', addComment);
+router.get('/sortedProducts',getproductSortedbyCreatedDate)
 module.exports = router;
