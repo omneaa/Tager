@@ -42,10 +42,10 @@ const productSchema = mongoose.Schema({
     type: Boolean,
     required: true,
   },
-  typeWarranty: {
+  typeWarranty: [{
     type: String,
     enum: ['return', 'repair', 'replacement'],
-  },
+  }],
   therearechooses: {
     type: Boolean,
     required: true,

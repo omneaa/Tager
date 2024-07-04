@@ -24,7 +24,18 @@ const AddProduct = async (req, res) => {
       throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
     }
     var x = req.params.id ;
-    // console.log(req.params.id); 
+    console.log(req.body.typeWarranty[0]); 
+    console.log(req.body.typeWarranty[1]);  
+    console.log(req.body.typeWarranty[2]);
+    arraytypewarranty=[] ;
+    if (req.body.typeWarranty[0] != undefined) {
+    arraytypewarranty.push(req.body.typeWarranty[0]);}
+    if (req.body.typeWarranty[1] != undefined) { 
+    arraytypewarranty.push(req.body.typeWarranty[1]);
+  }
+   if (req.body.typeWarranty[2] != undefined){
+    arraytypewarranty.push(req.body.typeWarranty[2]);
+   }
     const product = new productModel({
       video: `${req.files["video"][0].path}`,
       idVendor: x,
@@ -34,7 +45,7 @@ const AddProduct = async (req, res) => {
       hashtag: `${req.body.hashtag}`,
       price: `${req.body.price}`,
       warranty: `${req.body.warranty}`,
-      typeWarranty: `${req.body.typeWarranty}`,
+      typeWarranty: arraytypewarranty ,
       status: "Pending",
       therearechooses: `${req.body.therearechooses}`,
     });
