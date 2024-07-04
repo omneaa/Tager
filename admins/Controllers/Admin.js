@@ -392,9 +392,13 @@ catch(e){
 
 
 
+
+
 const AdminLogin=async(req,res)=>{
     try{
+    
     let result=await Admin.find({"Email":req.params.email},{Password:1,_id:1});
+
     const found = JSON.stringify(result);
     if(found==="[]")
      {
@@ -422,11 +426,57 @@ const AdminLogin=async(req,res)=>{
 catch(e){
     res.status(400).json({"error":e.error});
 }
-}
+};
+
 
 const AdminLogout=async(req,res)=>{
     return res.status(200).json({"message":"ok"});
+};
+
+
+
+
+
+
+
+
+const SuperAdminLogin=async(req,res)=>{
+    try{
+    
+    let result=await SuperAdmin.find({"Email":req.params.email},{Password:1,_id:1});
+
+    const found = JSON.stringify(result);
+    if(found==="[]")
+     {
+        return res.status(400).json({"message":"this Super admin email not found"});
+     }
+        
+    for (const [key, value] of Object.entries(result)) {
+    let password=value.Password;
+    let ID=value._id;
+    let isPasswordValid = await bcrypt.compareSync(req.params.password,password);
+    if(isPasswordValid){
+        const data = {
+            AdminId:result._id,
+            Email:result.Email
+        };
+        const token = jwt.sign(data, jwtSecretKey);
+        return res.status(200).json({"message":"ok","JWT":token,"Super Admin ID":ID});
+
+    }
+    else
+    {
+        return res.status(400).json({"message":"the password is wrong "});
+    }
+}}
+catch(e){
+    res.status(400).json({"error":e.error});
 }
+}
+
+
+
+
 
 
 
@@ -572,5 +622,5 @@ const EditSuperAdmin=async (req,res)=>{
 
 module.exports ={NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests,EditVendorRequests,AddVendor,
     DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,DeleteAdmin,AdminLogin,AdminLogout,
-    AddClient,DeleteClient,AllClients,SendMailToAllClients,ClientsNum,AddNewSuperAdmin,AllSuperAdmins,DeleteSuperAdmin,EditAdmin,EditSuperAdmin
+    AddClient,DeleteClient,AllClients,SendMailToAllClients,ClientsNum,AddNewSuperAdmin,AllSuperAdmins,DeleteSuperAdmin,EditAdmin,EditSuperAdmin,SuperAdminLogin
 };

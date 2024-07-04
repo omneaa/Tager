@@ -192,31 +192,6 @@ mailTransporter.sendMail(mailDetails,function (err, data) {
 	}
 });
 
-
-
-
-	//  const findVendor=await Vendor.findOne({"vendorEmail":req.body.VendorEmail});
-	 
-	//  if(findVendor)
-	//  {
-	// 	return res.status(400).json({message:"this email alreadt exsit"});
-	//  }
-	 
-
-
-
-
-
-	//  const result=await Vendor.create(data);
-	//    if (result) {
-	// 	res.status(200).json({"message":'your request sent to admins',data:result});
-	
-	// 	} else {
-	// 		res.status(400).json("Error sending your request please try later ");
-		  
-	// 	}     
-	
-   
 	
 }
 catch(e){
