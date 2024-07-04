@@ -10,19 +10,19 @@ const coponSchema = mongoose.Schema({
       type: String,
       required: true,
       trim: true,
-      unique: true // Ensure no duplicate coupon codes
+      unique: true 
     },
     type: {
       type: String,
       required: true,
-      enum: ['percentage', 'fixedAmount'] // Allow only these types
+      enum: ['percentage', 'fixedAmount'] 
     },
     discount: {
       type: Number,
       required: true,
      
     },
-    total: { // Optional field, comment out if not needed
+    total: { 
       type: Number,
       // min: 0 // Minimum total amount for the discount to apply (optional)
     },
@@ -34,11 +34,11 @@ const coponSchema = mongoose.Schema({
       type: Boolean,
       // default: false // Whether the coupon waives delivery charges (optional)
     },
-    products: { // Array to store associated product IDs (optional)
-    //   type: [mongoose.Schema.Types.ObjectId],
-    //   ref: 'products' // Reference to the Product model (optional)
-       type : [String]
-    },
+    products: [{ // Array to store associated product IDs (optional)
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'products' // Reference to the Product model (optional)
+      //  type : [String]
+    }],
     startDate: {
       type: Date,
       required: true

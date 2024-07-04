@@ -103,8 +103,10 @@ const productSchema = mongoose.Schema({
   views:{
     type:Number,
     default:0 
-  }
-  , 
+  }, copons:[{
+    type: mongoose.Schema.Types.ObjectId,
+      ref :'copons', 
+  } ],
   comments: [{
     client: {
       type: mongoose.Schema.Types.ObjectId,

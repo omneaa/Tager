@@ -1,33 +1,53 @@
 const coponModel = require ('../Models/copons');
-const AddCopon = async (req, res) => {
-    try {
-      
-      const { coponName, code, type, discount, ...otherData } = req.body; 
+const productModel = require("../../products/Models/product");
+const AddCoponstoAllProducts = async (req, res) => {
+  try {
 
-      const newCopon = new coponModel({
-        coponName,
-        code,
-        type,
-        discount,
-        ...otherData // Include other optional fields from the request body
-      });
-  
-      // Validate the new copon data using the coponModel schema (optional)
-    //   const validationError = newCopon.validateSync();
-    //   if (validationError) {
-    //     const errorMessages = Object.values(validationError.errors).map(err => err.message).join(', ');
-    //     return res.status(400).json({ message: `Validation error: ${errorMessages}` });
-    //   }
-  
-      await newCopon.save();
-      console.log('Coupon created successfully:', newCopon);
-  
-      res.status(201).json({ message: 'Coupon created successfully!', coupon: newCopon });
-    } catch (error) {
-      console.error('Error creating coupon:', error.message);
-      res.status(500).json({ message: 'Error creating coupon:', error });
-    }
-  };
+    const newCopon = req.body;
+    const copon = new coponModel(newCopon);
+    await copon.save();
+
+    // 4. Update all products to reference the newly created coupon
+    await productModel.updateMany({}, { $push: { copons: copon._id } });
+
+    res.status(200).json({
+      message: 'Coupon added to all products successfully!',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'Error adding coupon to products!',
+      error: error.message,
+    });
+  }
+};
+const AddCoponToSpacifcProducts = async (req, res) => {
+  try {
+    const newCopon = req.body;
+    const copon = new coponModel(newCopon);
+    await copon.save();
+    const productIds = req.body.products; 
+    if (productIds && productIds.length > 0) {
+      // Validate product IDs (optional, depending on your requirements)
+      // if (!Array.isArray(productIds) || productIds.some(id => !mongoose.Types.ObjectId.isValid(id))) {
+      //   throw new Error('Invalid product IDs');
+      // }
+
+      // Update products with the provided IDs
+      await productModel.updateMany({ _id: { $in: productIds } }, { $push: { copons: copon._id } });
+    } 
+
+    res.status(200).json({
+      message: 'Coupon added to selected products successfully!',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
+      message: 'Error adding coupon to products!',
+      error: error.message,
+    });
+  }
+};
   const getAllCopons = async (req, res) => {
     try {
       // Fetch all coupons from the database
@@ -83,4 +103,4 @@ const AddCopon = async (req, res) => {
     }
   };
   
-module.exports =  {AddCopon  , getAllCopons , DeleteCopon , updateCopon }
+module.exports =  {AddCoponstoAllProducts , getAllCopons , DeleteCopon , updateCopon  , AddCoponToSpacifcProducts}
