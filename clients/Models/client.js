@@ -10,11 +10,13 @@ reqire:true
     },
     PhoneNumber:{
         type:Number,
-        reqire:true
+        reqire:true,
+        unique:true
     },
     Email:{
         type:String,
         reqire:true,
+        unique:true
         
         },
     Password:{

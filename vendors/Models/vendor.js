@@ -14,11 +14,14 @@ reqire:true
     },
     vendorPhone:{
         type:Number,
-        reqire:true
+        reqire:true,
+        unique:true
+        
     },
        vendorEmail:{
         type:String,
         reqire:true,
+        unique:true
         
         },
         typeOfLicense:{

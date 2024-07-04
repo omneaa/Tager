@@ -72,7 +72,7 @@ const ValidateCode=async(req,res)=>{
 	if(code==ID)
 		{
 
-
+	
 			const jwtSecretKey = process.env.SECRET;
 			const user=await Vendor.findOne({VendorEmail:req.params.vendorEmail});
 			const data = {

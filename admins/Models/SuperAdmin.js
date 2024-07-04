@@ -4,7 +4,7 @@ const SuperAdminSchema=mongoose.Schema({
        Email:{
         type:String,
         reqire:true,
-        
+        unique:true
         },
         Password:{
             type:String,

@@ -43,7 +43,7 @@ const upload2 = multer({ storage, fileFilter2});
 
 router.post('/send-code/:email',SendCode);
 
-router.post('/validate-code/:code/:email',ValidateCode);
+router.post('/validate-code/:code/:vendorEmail',ValidateCode);
 router.post('/message-otp',MessageOtp);
 
 router.post('/new-vendor/:Id/:email/:status',auth,NewVendor);
