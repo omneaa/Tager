@@ -74,7 +74,7 @@ const ValidateCode=async(req,res)=>{
 
 	
 			const jwtSecretKey = process.env.SECRET;
-			const user=await Vendor.findOne({VendorEmail:req.params.vendorEmail});
+			const user=await Vendor.findOne({vendorEmail:req.params.vendorEmail});
 			const data = {
 				time: Date(),
 			};
