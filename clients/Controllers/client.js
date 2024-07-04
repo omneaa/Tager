@@ -58,7 +58,7 @@ return res.status(200).json({"message":"lowest price products","product":result}
 }
 
 const ViewHighestPriceProducts=async(req,res)=>{
-    const result= await Product.find({"status":Accepted}).sort({price:-1});
+    const result= await Product.find().sort({price:-1});
     return res.status(200).json({"message":"highest price products","product":result});
     }
 
