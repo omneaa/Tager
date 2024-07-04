@@ -77,7 +77,6 @@ const ValidateCode=async(req,res)=>{
 			const user=await Vendor.findOne({VendorEmail:req.params.vendorEmail});
 			const data = {
 				time: Date(),
-				userId: user._id,
 			};
 			const token = jwt.sign(data, jwtSecretKey);
 			res.send({"message":'the code is right', "token":token,"data":user});
