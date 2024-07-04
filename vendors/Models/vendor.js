@@ -8,7 +8,7 @@ reqire:true
         type:String,
         reqire:true
     },
-    vendoeLocation:{
+    vendorLocation:{
         type:String,
         reqire:true
     },
