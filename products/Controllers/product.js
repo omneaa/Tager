@@ -344,7 +344,31 @@ const getproductSortedbyCreatedDate = async (req, res) =>{
     });
   }
 }
-
+const shareproductbyLink=async (req, res) =>{
+  try {
+    const product = await productModel.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    const url = `https://tager.onrender.com/products/product/${product._id}`;
+    res.status(200).json({ message: "Product link shared successfully", link: url });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to share product", error: error.message });
+  }
+}
+const getProductByid=async (req,res) =>{
+  try {
+    const product = await productModel.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to get product", error: error.message });
+  }
+}
 module.exports = {
   AddProduct,
   getAllproducts,
@@ -356,5 +380,7 @@ module.exports = {
   getpendingproducts,
   numberofproductwhichisnotpending,
   addComment,
-  getproductSortedbyCreatedDate
+  getproductSortedbyCreatedDate,
+  shareproductbyLink,
+  getProductByid
 };

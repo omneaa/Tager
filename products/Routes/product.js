@@ -6,7 +6,7 @@ const path = require('path');
 const {auth} = require('../../middlewares/auth') ; 
 var {AddProduct, getAllproducts ,editProductStatus, addReview , getproductsbyvendorid ,
   Addchoose, getReviewsByVendorId, getpendingproducts,numberofproductwhichisnotpending,
-  addComment, getproductSortedbyCreatedDate }  = require('../Controllers/product');
+  addComment, getproductSortedbyCreatedDate , shareproductbyLink , getProductByid}  = require('../Controllers/product');
 const fileFilter = (req, file, cb) => {
     let ext = path.extname(file.originalname);
     // consloe(ext)
@@ -30,5 +30,7 @@ router.get('/reviews/:id',auth,getReviewsByVendorId)
 router.get('/pendingproducts',getpendingproducts)
 router.get('/numberofproducts' , numberofproductwhichisnotpending) ; 
 router.patch ('/comment/:id', addComment);
-router.get('/sortedProducts',getproductSortedbyCreatedDate)
+router.get('/sortedProducts',getproductSortedbyCreatedDate);
+router.get('/share/:id' , shareproductbyLink) ; 
+router.get('/product/:id', getProductByid)
 module.exports = router;
