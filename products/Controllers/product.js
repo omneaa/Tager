@@ -171,9 +171,9 @@ const editProductStatus = async (req, res) => {
 const addReview = async (req, res) => {
   try {
     const { productId, userId, rating, reviewText } = req.body;
-     const product=await productModel.findById(productId);
-     const totalRating = Number(product.totalRating)+Number(rating);
-     const averageRating = Number(totalRating)/((product.reviews.length+1));
+    const product=await productModel.findById(productId);
+    const totalRating = Number(product.totalRating)+Number(rating);
+    const averageRating = (Number(totalRating)/(5*(product.reviews.length+1)))*5;
     const newReview = {
       userId,
       rating,

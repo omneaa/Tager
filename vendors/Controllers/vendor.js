@@ -164,6 +164,21 @@ try{
 		LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
 		AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`,
 	}
+	const vendorEmail=await Vendor.findOne({"vendorEmail":`${req.body.vendorEmail}`});
+	// const vendorPhone=await Vendor.findOne({vendorPhone:`${req.body.vendorPhone}`});
+	// console.log(vendorEmail);
+	// console.log(vendorPhone);
+	// if(vendorEmail)
+	// {
+	// 	console.log("found");
+	// }
+	// else
+	// {
+	// 	console.log("not found");	
+	// }
+
+    
+
 	if (req.body.vendorName.length  === 0||req.body.brandName.length=== 0||req.body.vendorLocation.length===0||req.body.vendorPhone.length===0||req.body.vendorEmail.length===0||
 		req.body.typeOfLicense.length===0||req.body.licenseNumber.length===0||req.body.registeredWithAddedTax.length===0||req.files['AddedTaxFile'][0].path.length===0||
 		req.files['AddedTaxFile'][0].path.length===0

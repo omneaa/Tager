@@ -53,18 +53,18 @@ return res.status(200).json({"message":"done","product":result});
 
 
 const ViewLowestPriceProducts=async(req,res)=>{
-const result= await Product.find().sort({price:1});
+const result= await Product.find({"status":"Accepted"}).sort({price:1});
 return res.status(200).json({"message":"lowest price products","product":result});
 }
 
 const ViewHighestPriceProducts=async(req,res)=>{
-    const result= await Product.find().sort({price:-1});
+    const result= await Product.find({"status":"Accepted"}).sort({price:-1});
     return res.status(200).json({"message":"highest price products","product":result});
     }
 
 
 const ViewHighRatedProducts=async(req,res)=>{
-    const result=await Product.find().sort({averageRating:-1})
+    const result=await Product.find({"status":"Accepted"}).sort({averageRating:-1})
     return res.status(200).json({"message":"high rated products","products":result});
 }
 
@@ -73,8 +73,15 @@ const AddVendorReview=async(req,res)=>{
     try {
         const { vendorId, userId, rating, reviewText } = req.body;
          const vendor=await Vendor.findById(vendorId);
+         if(!vendor)
+         {
+          console.log("not found");
+          return res.status(404).json({ message: "vendor not found"});
+         }
+         else
+         {
          const totalRating = Number(vendor.totalRating)+Number(rating);
-         const averageRating = Number(totalRating)/((vendor.reviews.length+1));
+         const averageRating = ((Number(totalRating)/(5*(vendor.reviews.length+1))))*5;
         const newReview = {
           userId,
           rating,
@@ -94,11 +101,10 @@ const AddVendorReview=async(req,res)=>{
         res
           .status(201)
           .json({ message: "Review added successfully to vendor", data: updated});
-      } catch (error) {
-        console.error(error);
+      } }catch (error) {
         res
           .status(400)
-          .json({ message: "Failed to add review", error: error.message });
+          .json({ message: "Failed to add review", error: "vendor not found" });
       }
 }
 
@@ -112,7 +118,7 @@ const ViewAllVendorReviews=async(req,res)=>{
         return res
           .status(200)
           .json({
-            message: "Product reviews retrieved successfully",
+            message: "vendor reviews retrieved successfully",
             data: vendorReviews,
           });
       } catch (error) {

@@ -24,13 +24,11 @@ router.patch('/add-vendor-review',auth,AddVendorReview);
 router.get('/view-vendor-reviews/:id',ViewAllVendorReviews);
 router.patch('/increase-product-views/:id',IncreaseProductViews);
 router.get('/all-trending-products',ViewTrendingProducts);
-router.patch('/add-favourite-product/:productId/:clientId',AddFavouriteProduct);
-router.delete('/delete-favourite-product/:productId/:clientId',DeleteFavouriteProduct);
-router.patch('/follow-vendor/:vendorId/:clientId',FollowVendor);
-router.delete('/unfollow-vendor/:vendorId/:clientId',UnfollowVendor);
-
-//not complete
-router.get('/all-favourite-products/:clientId',GetAllFavouriteProducts);
+router.patch('/add-favourite-product/:productId/:clientId',auth,AddFavouriteProduct);
+router.delete('/delete-favourite-product/:productId/:clientId',auth,DeleteFavouriteProduct);
+router.patch('/follow-vendor/:vendorId/:clientId',auth,FollowVendor);
+router.delete('/unfollow-vendor/:vendorId/:clientId',auth,UnfollowVendor);
+router.get('/all-favourite-products/:clientId',auth,GetAllFavouriteProducts);
 
 
 module.exports = router;
