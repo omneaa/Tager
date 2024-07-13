@@ -165,17 +165,7 @@ try{
 		AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`,
 	}
 	const vendorEmail=await Vendor.findOne({"vendorEmail":`${req.body.vendorEmail}`});
-	// const vendorPhone=await Vendor.findOne({vendorPhone:`${req.body.vendorPhone}`});
-	// console.log(vendorEmail);
-	// console.log(vendorPhone);
-	// if(vendorEmail)
-	// {
-	// 	console.log("found");
-	// }
-	// else
-	// {
-	// 	console.log("not found");	
-	// }
+	
 
     
 

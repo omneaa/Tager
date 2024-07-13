@@ -3,7 +3,7 @@ const FollowerSchema=mongoose.Schema({
     ClientId:{
 type:String
     },
-    Followers:[{
+    ClientFollowers:[{
      VendorId:{
      type:String
         }
