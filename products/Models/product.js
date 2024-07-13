@@ -120,7 +120,24 @@ const productSchema = mongoose.Schema({
     createdAt: {
       type: Date,
       default: Date.now,
-    }
+    }, 
+    replies: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          // ref: 'User', // Assuming a User model
+          required: true
+        },
+        reply: {
+          type: String,
+          required: true
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ]
   }],
 
 } , { timestamps: true })

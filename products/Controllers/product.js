@@ -369,6 +369,163 @@ const getProductByid=async (req,res) =>{
     res.status(500).json({ message: "Failed to get product", error: error.message });
   }
 }
+const addReply = async (req, res) => {
+  try {
+    const { productId, commentId, user, reply } = req.body;
+    console.log(productId , " " , commentId);
+    // Find the product
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Find the comment to reply to
+    const comment = product.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // Create the reply
+    const newReply = {
+      user,
+      reply,
+      createdAt: Date.now()
+    };
+
+    // Add the reply to the comment's replies array
+    comment.replies.push(newReply);
+
+    // Save the updated product
+    await product.save();
+
+    res.status(201).json({ message: 'Reply added successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error adding reply' });
+  }
+};
+
+const deletecomment  = async (req, res) => {
+  try {
+    const productId = req.params.pId;
+    const commentId = req.params.cId;
+
+    // Find the product
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Find the comment within the product's comments array
+    const commentIndex = product.comments.findIndex(c => c._id.toString() === commentId);
+    if (commentIndex === -1) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // Remove the comment from the array
+    product.comments.splice(commentIndex, 1);
+
+    // Save the updated product
+    await product.save();
+
+    res.status(200).json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error deleting comment' });
+  }
+};
+const EditComment= async (req,res) => {
+  try {
+    const productId = req.params.pId;
+    const commentId = req.params.cId;
+    const newCommentText = req.body.newCommentText;
+    // Find the product 
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    // Find the comment within the product's comments array
+    const commentIndex = product.comments.findIndex(c => c._id.toString() === commentId);
+    if (commentIndex === -1) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+    // Update the comment text
+    product.comments[commentIndex].comment= newCommentText;
+    // Save the updated product
+    await product.save();
+    res.status(200).json({ message: 'Comment updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error editing comment' });
+  }
+}
+const deleteReply = async (req, res) => {
+  try {
+    const productId = req.params.pId;
+    const commentId = req.params.cId;
+    const replyId = req.params.rId;
+
+    // Find the product
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Find the comment
+    const comment = product.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // Find the reply index
+    const replyIndex = comment.replies.findIndex(reply => reply._id.toString() === replyId);
+    if (replyIndex === -1) {
+      return res.status(404).json({ message: 'Reply not found' });
+    }
+
+    // Remove the reply
+    comment.replies.splice(replyIndex, 1);
+
+    // Save the updated product
+    await product.save();
+
+    res.status(200).json({ message: 'Reply deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error deleting reply' });
+  }
+};
+const EditReply = async(req, res) => {
+  try {
+    const productId = req.params.pId;
+    const commentId = req.params.cId;
+    const replyId = req.params.rId;
+    const newReplyText = req.body.newReplyText;
+    // Find the product
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    // Find the comment
+    const comment = product.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+    // Find the reply index
+    const replyIndex = comment.replies.findIndex(reply => reply._id.toString() === replyId);
+    if (replyIndex === -1) {
+      return res.status(404).json({ message: 'Reply not found' });
+    }
+    // Update the reply text
+    comment.replies[replyIndex].reply = newReplyText;
+    // Save the updated product
+    await product.save();
+    res.status(200).json({ message: 'Reply updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error editing reply' });
+  }
+}
 module.exports = {
   AddProduct,
   getAllproducts,
@@ -382,5 +539,10 @@ module.exports = {
   addComment,
   getproductSortedbyCreatedDate,
   shareproductbyLink,
-  getProductByid
+  getProductByid ,
+  addReply,
+  deletecomment, 
+  EditComment ,
+  deleteReply,
+  EditReply
 };
