@@ -6,13 +6,15 @@ const Client=require('../../clients/Models/client');
 const Followers=require('../../clients/Models/followers');
 const Product=require('../../products/Models/product')
 const Vendor=require('../../vendors/Models/vendor');
+const Essay=require('../../admins/Models/Essay');
 let hashedPassword ;
 const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 const jwtSecretKey = process.env.SECRET;
 
 const login=async(req,res)=> {
     try{
-        let result=await Client.find({"Email":req.params.Email},{Password:1,_id:1});
+      let data;
+        let result=await Client.find({"Email":req.params.Email},{"FavouriteProducts":0,_id:1});
         const found = JSON.stringify(result);
         if(found==="[]")
          {
@@ -22,14 +24,14 @@ const login=async(req,res)=> {
         for (const [key, value] of Object.entries(result)) {
         let password=value.Password;
         let ID=value._id;
-        let isPasswordValid = await bcrypt.compareSync("123",password);
+        let isPasswordValid = await bcrypt.compareSync(req.params.Password,password);
         if(isPasswordValid){
-            const data = {
+             data = {
                 id:result._id,
                 Email:result.Email
             };
             const token = jwt.sign(data, jwtSecretKey);
-            return res.status(200).json({"message":"ok","JWT":token,"ClientID":ID});
+            return res.status(200).json({"message":"ok","JWT":token,"Client data":result});
     
         }
         else
@@ -232,9 +234,10 @@ const ID={
   vendorId
 }
 
-let result=await Followers.findOneAndUpdate({"ClientId":req.params.clientId},{$push:{Followers:{ VendorId: vendorId }}},{new:true});
+
+let result=await Followers.findOneAndUpdate({"ClientId":req.params.clientId},{$push:{ClientFollowers:{ VendorId: vendorId }}},{new:true});
 if(!result){
-   return result=await Followers.create({"ClientId":req.params.clientId},{$push:{Followers:{ VendorId: vendorId }}});
+   return result=await Followers.create({"ClientId":req.params.clientId},{$push:{ClientFollowers:{ VendorId: vendorId }}});
 }
 else{
 return res.status(200).json({ message: "now you follow new vendor",result:result});
@@ -251,7 +254,7 @@ const UnfollowVendor=async(req,res)=>{
     const ID={
       vendorId
     }                                                                      
-  const result=await Followers.findOneAndUpdate({"ClientId":req.params.clientId},{$pull:{Followers:{ VendorId:vendorId }}},{new:true});
+  const result=await Followers.findOneAndUpdate({"ClientId":req.params.clientId},{$pull:{ClientFollowers:{ VendorId:vendorId }}},{new:true});
 
   return res.status(200).json({ message: "now you unfollwed vendor",result:result});
 }
@@ -262,7 +265,115 @@ catch(e){
 }
 
 
+const ClientSignup=async(req,res)=>{
+
+  try{
+    const {Email,Password,FirstName,LastName,PhoneNumber}=req.body;
+      const isClient=await Client.find({$or: [{"Email":Email},{PhoneNumber:PhoneNumber}]});
+      if(isClient.length!==0){
+       
+          return res.status(400).json({ "message": "email or phone exist"});
+      }
+      else
+      {
+   hashedPassword = await bcrypt.hash(Password, 10);
+  const newclient={
+      Email:Email,
+      Password:hashedPassword,
+      FirstName:FirstName,
+      LastName:LastName,
+      PhoneNumber:PhoneNumber
+  }
+  const result=await Client.create(newclient);
+  return res.status(200).json({"message":"signed up successfully","data":result});
+  }
+}
+  catch(e){
+      res.status(400).json({"error":e.error});
+  }
+  }
+
+
+  const AllEssays=async(req,res)=>{
+    try{
+    
+    const result = await Essay.find();
+    return res.status(200).json({ "message": "all essays","result":result});
+}catch(e){
+    res.status(400).json({"error":e.error});
+}
+}
+
+const DeleteClient=async(req,res)=>{
+  try{
+ 
+  const result=await Client.findByIdAndDelete(req.params.id);
+  return res.status(200).json({"message":"client account deleted"});
+}
+catch(e){
+  res.status(400).json({"error":e.error});
+}
+}
+const EditProfile=async(req,res)=>{
+  try{	
+    
+    if(req.body.Email){
+      const EmailCheck=await Client.find({"Email":req.body.Email});
+      if(EmailCheck.length !==0)
+      {
+        return res.status(400).json({ message: "the new email exist"});
+      }
+    }
+    if(req.body.PhoneNumber){
+      const PhoneCheck=await Client.find({"PhoneNumber":req.body.PhoneNumber});
+      if(PhoneCheck.length!==0)
+      {
+        return res.status(400).json({ message: "the new Phone number exist"});
+      }
+    }
+
+    
+if(req.body.Password){
+const hashedPassword = await bcrypt.hash(req.body.Password, 10);
+req.body.Password=hashedPassword;
+}
+
+
+        const data =await Client.findByIdAndUpdate(req.params.id,{$set:req.body},{new: true,select: "FirstName LastName _id Email"});
+        return res.status(200).json({ message: "profile edited", data:data});
+        }
+        catch(err){
+          return res.status(500).json({ error: err.message});
+        }
+}
+
+
+
+//Not complete have bug
+const GetAllFollowers=async(req,res)=>{
+  const clientId = req.params.clientId;
+  const vendorsDetails = [];
+  try {
+    const data = await Followers.find({"ClientId":clientId},{ClientFollowers: 1, _id: 0 });
+    //return res.json({data});
+    if (!data) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+    const vendorIds = data.ClientFollowers.map(vendor => vendor.VendorId);
+    for (const vendorId of vendorIds) {
+      let vendor=await Vendor.findById(vendorId,{__v:0});
+      vendorsDetails.push(vendor);
+    }
+    
+    return res.status(200).json({message: "your followers",vendorsDetails,
+    });
+  } catch (err) {
+   
+    return res.status(500).json({ message: 'Internal server error',"error":err.message });
+  }
+}
+
 module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
     ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct,DeleteFavouriteProduct,GetAllFavouriteProducts,
-    FollowVendor,UnfollowVendor
+    FollowVendor,UnfollowVendor,ClientSignup,AllEssays,DeleteClient,EditProfile,GetAllFollowers
   };

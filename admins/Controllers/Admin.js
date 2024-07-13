@@ -489,16 +489,25 @@ try{
         return res.status(400).json({ "message": "not allowed onlly admins and super admins allowed"});
     }
 
-    const {Email,Password,FirstName,LastName}=req.body;
+    const {Email,Password,FirstName,LastName,PhoneNumber}=req.body;
+    const isClient=await Client.find({$or: [{"Email":Email},{PhoneNumber:PhoneNumber}]});
+    if(isClient.length!==0){
+     
+        return res.status(400).json({ "message": "email or phone exist"});
+    }
+    else
+    {
  hashedPassword = await bcrypt.hash(Password, 10);
 const newclient={
     Email:Email,
     Password:hashedPassword,
     FirstName:FirstName,
-    LastName:LastName
+    LastName:LastName,
+    PhoneNumber:PhoneNumber
 }
 const result=await Client.create(newclient);
 return res.status(200).json({"message":"new client added","data":result});
+}
 }
 catch(e){
     res.status(400).json({"error":e.error});
