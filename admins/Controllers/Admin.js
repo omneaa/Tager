@@ -178,11 +178,11 @@ const DeleteVendor=async(req,res)=>{
 
 const AllVendors=async(req,res)=>{
     try{
-    const isAdmin=await Admin.findById(req.params.adminId);
-    const isSuperAdmin=await SuperAdmin.findById(req.params.adminId);
-    if(!isAdmin && !isSuperAdmin){
-        return res.status(400).json({ "message": "not allowed onlly admins and super admins allowed"});
-    }
+    // const isAdmin=await Admin.findById(req.params.adminId);
+    // const isSuperAdmin=await SuperAdmin.findById(req.params.adminId);
+    // if(!isAdmin && !isSuperAdmin){
+    //     return res.status(400).json({ "message": "not allowed onlly admins and super admins allowed"});
+    // }
 
     const result=await Vendor.find({status:"accepted"});
     return res.status(200).json({ "message": "all vendors","result":result });
@@ -194,11 +194,11 @@ const AllVendors=async(req,res)=>{
 
 const VendorProfile=async(req,res)=>{
 try{
-    const isAdmin=await Admin.findById(req.params.adminId);
-    const isSuperAdmin=await SuperAdmin.findById(req.params.adminId);
-    if(!isAdmin && !isSuperAdmin){
-        return res.status(400).json({ "message": "not allowed onlly admins and super admins allowed"});
-    }
+    // const isAdmin=await Admin.findById(req.params.adminId);
+    // const isSuperAdmin=await SuperAdmin.findById(req.params.adminId);
+    // if(!isAdmin && !isSuperAdmin){
+    //     return res.status(400).json({ "message": "not allowed onlly admins and super admins allowed"});
+    // }
 
     const result=await Vendor.findById(req.params.id);
     return res.status(200).json({ "message": "vendor Profile","result":result });

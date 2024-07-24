@@ -29,11 +29,14 @@ router.post('/new-admin/:adminId',auth,AddNewAdmin);
 router.post('/new-super-admin/:adminId',auth,AddNewSuperAdmin);
 router.post('/new-vendor/:adminId',auth,upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),AddVendor);
 router.delete('/vendor/:id/:adminId',auth,DeleteVendor);
-router.get('/all-vendors/:adminId',auth,AllVendors);
+//
+router.get('/all-vendors',AllVendors);
 router.get('/all-clients/:adminId',auth,AllClients);
 router.get('/all-admins/:adminId',auth,AllAdmins);
 router.get('/all-super-admins/:adminId',auth,AllSuperAdmins);
-router.get('/vendor/:id/:adminId',auth,VendorProfile);
+
+//
+router.get('/vendor/:id',VendorProfile);
 router.post('/new-client/:adminId',auth,AddClient);
 router.post('/admin-login/:email/:password',AdminLogin);
 router.post('/super-admin-login/:email/:password',SuperAdminLogin);
