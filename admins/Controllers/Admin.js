@@ -8,6 +8,7 @@ const EditVendor=require('../../vendors/Models/Edit');
 const Client=require('../../clients/Models/client');
 const Admin=require('../Models/Admin');
 const SuperAdmin=require('../Models/SuperAdmin');
+const { json } = require('body-parser');
 // let AdminFound = (req,res)=>{
 //    // Admin.findById(res.id);
 //     console.log(req.id);
@@ -236,7 +237,7 @@ for (const [key, value] of Object.entries(vendors)) {
             res.status(500).json(`${err}`);
         } else {
             console.log(`email sent to ${value.vendorEmail}`);
-            res.status(200).json({"message":'Email sent successfully to vendor'});
+            res.status(200).json({"message":'Email sent successfully to vendors'});
         }
     });
 }
@@ -289,7 +290,7 @@ try{
     }
 
     const admins=await SuperAdmin.find({},{Email:1});
-    return res.status(200).json({"message":"all super admins","result":`${admins}`});
+    return res.status(200).json({"message":"all super admins","result":admins});
 }
 catch(e){
     res.status(400).json({"error":e.error});
@@ -361,7 +362,7 @@ try{
     }
 
     const admins=await Admin.find({},{Email:1});
-    return res.status(200).json({"message":"all admins","result":`${admins}`});
+    return res.status(200).json({"message":"all admins","result":admins});
 
 }
 catch(e){
@@ -546,7 +547,9 @@ const AllClients=async(req,res)=>{
         return res.status(400).json({ "message": "not allowed onlly admins and super admins allowed"});
     }
     const clients=await Client.find({},{Password:0});
-    return res.status(200).json({"message":"all clients","data":`${clients}`});
+    // const clientString= json.stringify(clients);
+    // JSON.parse()
+    return res.status(200).json({"message":"all clients","data":clients});
 }
 catch(e){
     res.status(400).json({"error":e.error});
@@ -574,7 +577,7 @@ for (const [key, value] of Object.entries(clients)) {
             console.error(err);
             res.status(500).json(`${err}`);
         } else {
-            console.log(`email sent to ${value.Email}`);
+            //console.log(`email sent to ${value.Email}`);
             res.status(200).json({"message":'Email sent successfully to clients'});
         }
     });
@@ -629,7 +632,7 @@ const EditSuperAdmin=async (req,res)=>{
 }
 }
 
-module.exports ={NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests,EditVendorRequests,AddVendor,
+module.exports ={NewEssay,DeleteEssay,AllEssays,EditEssay,NewVendorsRequests,EditVendorRequests,AddVendor,
     DeleteVendor,AllVendors,VendorProfile,SendMailToAllVendors,AddNewAdmin,AllAdmins,DeleteAdmin,AdminLogin,AdminLogout,
     AddClient,DeleteClient,AllClients,SendMailToAllClients,ClientsNum,AddNewSuperAdmin,AllSuperAdmins,DeleteSuperAdmin,EditAdmin,EditSuperAdmin,SuperAdminLogin
 };
