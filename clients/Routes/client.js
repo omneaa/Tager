@@ -25,7 +25,7 @@ router.patch('/add-vendor-review',auth,AddVendorReview);
 router.get('/view-vendor-reviews/:id',ViewAllVendorReviews);
 router.patch('/increase-product-views/:id',IncreaseProductViews);
 router.get('/all-trending-products',ViewTrendingProducts);
-router.patch('/add-favourite-product/:productId/:clientId',auth,AddFavouriteProduct);
+router.patch('/add-favourite-product/:vendorId/:productId/:clientId',auth,AddFavouriteProduct);
 router.delete('/delete-favourite-product/:productId/:clientId',auth,DeleteFavouriteProduct);
 router.patch('/follow-vendor/:vendorId/:clientId',auth,FollowVendor);
 router.delete('/unfollow-vendor/:vendorId/:clientId',auth,UnfollowVendor);

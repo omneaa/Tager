@@ -27,6 +27,9 @@ reqire:true
     FavouriteProducts:[{
                 ProductId:{
                 type:String
+                },
+                vendorId:{
+                type:String
                 }
             }]
        
