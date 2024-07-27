@@ -6,6 +6,9 @@ const cloudinary = require('../../utils/cloudinary');
 const{sendNotification }=require('../../utils/sendNotification');
 const Vendor=require('../Models/vendor');
 const EditRequest=require('../Models/Edit');
+const FollowersSchema=require('../../clients/Models/followers');
+const Client=require('../../clients/Models/client')
+const productModel=require('../../products/Models/product');
 const axios = require('axios');
 const httpRequest = require('https');
 var ID;
@@ -279,10 +282,17 @@ const DeleteVendor=async(req,res)=>{
 
 	try {
 		
-			const result=await Vendor.findByIdAndDelete(req.params.Id);
-			res.status(200).json({ message: "Youe account deleted successfully"});
+		const products = await productModel.deleteMany({ idVendor:req.params.Id});
+		const requests=await EditRequest.findOneAndDelete({"VendorId":req.params.Id});
+		const follow=await FollowersSchema.updateMany({},{ $pull: { 'ClientFollowers':{ VendorId:req.params.Id} } });
+		const clients=await Client.updateMany({},{ $pull: { 'FavouriteProducts':{ vendorId:req.params.Id} } });
+		const result=await Vendor.findByIdAndDelete(req.params.Id);
+		//console.log(clients)
+			
+			res.status(200).json({ message: " account deleted successfully"});
 	} catch (error) {
-		return res.status(500).send('error');
+		console.log(error)
+		return res.status(500).json({"error":error})
 	}
 
 };
@@ -364,6 +374,7 @@ const EditVendorRequest=async(req,res)=>{
 			return res.status(400).json({message:"your input not math the fields requirements"});
 		 }
 
+        
 		const data={
 			vendorName: `${req.body.vendorName}`,
 			brandName: `${req.body.brandName}`,
@@ -384,7 +395,8 @@ console.log(result);
 		
 	}
 	catch(e){
-		res.status(400).json(e);
+
+		return res.status(400).json({error:e});
 	}
 };
 

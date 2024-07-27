@@ -170,11 +170,11 @@ catch(e){
 
 const AddFavouriteProduct=async(req,res)=>{
   try{
-    const {productId}=req.params;
+    const {productId,vendorId}=req.params;
     const ID={
       productId
     }
-   const result=await Client.findByIdAndUpdate(req.params.clientId,{$push:{FavouriteProducts:{ ProductId: productId }}},{new:true});
+   const result=await Client.findByIdAndUpdate(req.params.clientId,{$push:{FavouriteProducts:{ ProductId: productId,vendorId:vendorId}}},{new:true});
 
   return res.status(200).json({ message: "product added to your favourite products",result:result});
 }
