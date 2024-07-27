@@ -77,7 +77,7 @@ const getConversationsByUserId = async (req, res) => {
     // Find conversations where the user is a participant
     const conversations = await conversationModel.find({
       participants: { $in: [userId] },
-    })
+    }).populate("messages");
 
     if (!conversations) {
       return res.status(200).json([]); // Return empty array if no conversations found
