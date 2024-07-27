@@ -69,4 +69,28 @@ const getMessages = async (req, res) => {
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
-module.exports = {sendMessage  , getMessages};
+
+const getConversationsByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find conversations where the user is a participant
+    const conversations = await conversationModel.find({
+      participants: { $in: [userId] },
+    })
+
+    if (!conversations) {
+      return res.status(200).json([]); // Return empty array if no conversations found
+    }
+
+    res.status(200).json(conversations);
+  } catch (error) {
+    console.log("Error in getConversationsByUserId: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports = getConversationsByUserId;
+
+
+module.exports = {sendMessage  , getMessages , getConversationsByUserId };

@@ -65,7 +65,7 @@ const productSchema = mongoose.Schema({
       },
       img: {
         type: String,
-      },color :{
+      },typeOfChoose:{
         type: String,
       }
     }

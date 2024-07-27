@@ -18,7 +18,7 @@ const express = require('express');
   const getNumberoforders=async(req,res)=>{
     try{
           const result=await ordersModel.countDocuments();
-          res.status(200).json({message:"number of vendors",data:result});
+          res.status(200).json({message:"number of Orders",data:result});
       }
       catch(e){
           res.status(400).json(e);

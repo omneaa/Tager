@@ -237,7 +237,7 @@ const Addchoose = async (req, res) => {
     const newChoose = {
       namechoose: `${req.body.namechoose}`,
       pricetypechoose: `${req.body.pricetypechoose}`,
-      color: `${req.body.color}`,
+      typeOfChoose: `${req.body.typeOfChoose}`,
       pricechoose: `${req.body.pricechoose}`
         ? parseFloat(req.body.pricechoose)
         : null,
