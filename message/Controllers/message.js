@@ -90,7 +90,4 @@ const getConversationsByUserId = async (req, res) => {
   }
 };
 
-module.exports = getConversationsByUserId;
-
-
 module.exports = {sendMessage  , getMessages , getConversationsByUserId };

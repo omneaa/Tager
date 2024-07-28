@@ -7,7 +7,7 @@ const {auth} = require('../../middlewares/auth') ;
 var {AddProduct, getAllproducts ,editProductStatus, addReview , getproductsbyvendorid ,
   Addchoose, getReviewsByVendorId, getpendingproducts,numberofproductwhichisnotpending,
   addComment, getproductSortedbyCreatedDate , shareproductbyLink , getProductByid,addReply ,
-  deletecomment ,EditComment, deleteReply , EditReply}  = require('../Controllers/product');
+  deletecomment ,EditComment, deleteReply , EditReply ,DeleteProduct}  = require('../Controllers/product');
 const fileFilter = (req, file, cb) => {
     let ext = path.extname(file.originalname);
     // consloe(ext)
@@ -23,7 +23,7 @@ router.post('/add/:id',upload.fields([{ name: 'img', maxCount: 1 },
                       { name: 'video', maxCount: 1 }]),
  AddProduct);
 router.patch('/choose/:id' , upload.single('img') , Addchoose) ; 
-router.get('/getall', auth,getAllproducts);
+router.get('/getall',getAllproducts);
 router.patch('/editstatus/:vendorEmail',editProductStatus);
 router.patch('/addreview' ,addReview) ;
 router.get('/products/:id',auth,getproductsbyvendorid)
@@ -40,4 +40,5 @@ router.patch('/editcomment/:pId/:cId',EditComment);
 router.delete('/deletereply/:pId/:cId/:rId',deleteReply);
 
 router.patch('/editreply/:pId/:cId/:rId',EditReply);
+router.delete('/deleteproduct/:id' , DeleteProduct) ; 
 module.exports = router;

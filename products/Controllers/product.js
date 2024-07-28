@@ -526,6 +526,23 @@ const EditReply = async(req, res) => {
     res.status(500).json({ error: 'Error editing reply' });
   }
 }
+const DeleteProduct =async (req, res) => {
+  try {
+    const productId = req.params.id;
+    // Find the product and remove it
+    // find the product first 
+   // console.log(productId);
+    const product = await productModel.findByIdAndDelete(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.status(200).json({ message: 'Product deleted successfully' });
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error deleting product' });
+  }
+}
 module.exports = {
   AddProduct,
   getAllproducts,
@@ -544,5 +561,6 @@ module.exports = {
   deletecomment, 
   EditComment ,
   deleteReply,
-  EditReply
+  EditReply,
+  DeleteProduct
 };
