@@ -11,6 +11,12 @@ let hashedPassword ;
 const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 const jwtSecretKey = process.env.SECRET;
 
+
+function validEmail(email){
+  const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
+  return regex.test(email);
+}
+
 const login=async(req,res)=> {
     try{
       let data;
@@ -269,6 +275,10 @@ const ClientSignup=async(req,res)=>{
 
   try{
     const {Email,Password,FirstName,LastName,PhoneNumber}=req.body;
+    if(!validEmail(req.body.Email)){
+      return res.status(400).json({ "message": "email not valid"});
+}  
+
       const isClient=await Client.find({$or: [{"Email":Email},{PhoneNumber:PhoneNumber}]});
       if(isClient.length!==0){
        
@@ -318,11 +328,15 @@ const EditProfile=async(req,res)=>{
   try{	
     
     if(req.body.Email){
+      if(!validEmail(req.body.Email)){
+        return res.status(400).json({ "message": "email not valid"});
+ }
       const EmailCheck=await Client.find({"Email":req.body.Email});
       if(EmailCheck.length !==0)
       {
         return res.status(400).json({ message: "the new email exist"});
       }
+      
     }
     if(req.body.PhoneNumber){
       const PhoneCheck=await Client.find({"PhoneNumber":req.body.PhoneNumber});
@@ -331,6 +345,7 @@ const EditProfile=async(req,res)=>{
         return res.status(400).json({ message: "the new Phone number exist"});
       }
     }
+
 
     
 if(req.body.Password){
@@ -355,7 +370,6 @@ const GetAllFollowers=async(req,res)=>{
   const vendorsDetails = [];
   try {
     const data = await Followers.find({"ClientId":clientId},{ClientFollowers: 1, _id: 0 });
-    //return res.json({data});
     if (!data) {
       return res.status(404).json({ message: 'Client not found' });
     }
@@ -365,13 +379,13 @@ const GetAllFollowers=async(req,res)=>{
       vendorsDetails.push(vendor);
     }
     
-    return res.status(200).json({message: "your followers",vendorsDetails,
-    });
+    return res.status(200).json({message: "your followers",vendorsDetails });
   } catch (err) {
    
     return res.status(500).json({ message: 'Internal server error',"error":err.message });
   }
 }
+
 
 module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
     ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct,DeleteFavouriteProduct,GetAllFavouriteProducts,

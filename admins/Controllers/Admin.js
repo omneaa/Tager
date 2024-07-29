@@ -16,6 +16,12 @@ const { json } = require('body-parser');
 
 // } 
 
+function validEmail(email){
+    const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
+    return regex.test(email);
+  }
+
+
 let mailTransporter =nodemailer.createTransport(
 	{
 		service: 'gmail',
@@ -128,6 +134,14 @@ const AddVendor=async(req,res)=>{
     if(!isAdmin && !isSuperAdmin){
         return res.status(400).json({ "message": "not allowed onlly admins and super admins allowed"});
     }
+
+    if(!validEmail(req.body.vendorEmail)){
+           return res.status(400).json({ "message": "email not valid"});
+    }
+    const isFound=await Vendor.find({$or: [{"vendorEmail":req.body.vendorEmail},{vendorPhone:req.body.vendorPhone}]});
+    if(isFound){
+        return res.status(400).json({ "message": "email and phone must be unique"});  
+    }
     data={
 		vendorName: `${req.body.vendorName}`,
 		brandName: `${req.body.brandName}`,
@@ -158,6 +172,7 @@ const AddVendor=async(req,res)=>{
 		}
     }
     catch(e){
+        console.log(e);
         res.status(400).json({"error":e.error});
     }
 
@@ -266,12 +281,17 @@ const newadmin={
     Password:hashedPassword
 }
 const result=await SuperAdmin.create(newadmin);
-return res.status(200).json({"message":"new super admin added"});
+
+const data={
+    _id:result._id,
+    Email:Email,
+}
+return res.status(200).json({"message":"new super admin added",data});
 }
 
 catch(e)
 {
-    return res.status(400).json({"erre":e.message});
+    return res.status(400).json({"erre":"this email exist"});
 }}
 
 
@@ -335,16 +355,22 @@ const AddNewAdmin = async(req,res) => {
 
 const {Email,Password}=req.body;
  hashedPassword = await bcrypt.hash(Password, 10);
-const newadmin={
+let newadmin={
     Email:Email,
     Password:hashedPassword
 }
+
 const result=await Admin.create(newadmin);
-return res.status(200).json({"message":"new admin added"});
+newadmin={
+    Email:Email,
+    _id:result._id
+}
+
+return res.status(200).json({"message":"new admin added",data:newadmin});
 }
 
 catch(e){
-    return res.status(200).json({"message":e.error});
+    return res.status(200).json({"message":"email exist"});
 }
 }
 
@@ -609,6 +635,9 @@ const EditAdmin=async (req,res)=>{
     if(!isAdmin){
         return res.status(400).json({ "message": "not allowed onlly admins allowed"});
     }
+    if(!validEmail(req.body.Email)){
+        return res.status(400).json({ "message": "email not valid"});
+ }
     const result=await Admin.findByIdAndUpdate(req.params.adminId,{"Email":req.body.Email,"Password":req.body.Password});
     return res.status(200).json({ "message": "Admin profile updated"});
 }catch(e){
@@ -625,10 +654,16 @@ const EditSuperAdmin=async (req,res)=>{
     if( !isSuperAdmin){
         return res.status(400).json({ "message": "not allowed onlly super admins allowed"});
     }
+    if(!validEmail(req.body.Email)){
+        return res.status(400).json({ "message": "email not valid"});
+ }
+
+   
+    
     const result=await SuperAdmin.findByIdAndUpdate(req.params.adminId,{"Email":req.body.Email,"Password":req.body.Passwrd});
     return res.status(200).json({ "message": "super admin profile updated"});
 }catch(e){
-    res.status(400).json({"error":e.error});
+    res.status(400).json({"error":'email is found'});
 }
 }
 

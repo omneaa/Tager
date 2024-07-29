@@ -167,9 +167,12 @@ try{
 		LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
 		AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`,
 	}
-	const vendorEmail=await Vendor.findOne({"vendorEmail":`${req.body.vendorEmail}`});
 	
-
+	//const vendorEmail=await Vendor.findOne({"vendorEmail":`${req.body.vendorEmail}`});
+	const isFound=await Vendor.find({$or: [{"vendorEmail":req.body.vendorEmail},{vendorPhone:req.body.vendorPhone}]});
+	if(isFound){
+        return res.status(400).json({ "message": "email and phone must be unique"});  
+    }
     
 
 	if (req.body.vendorName.length  === 0||req.body.brandName.length=== 0||req.body.vendorLocation.length===0||req.body.vendorPhone.length===0||req.body.vendorEmail.length===0||
