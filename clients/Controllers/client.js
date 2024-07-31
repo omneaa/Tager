@@ -7,6 +7,7 @@ const Followers=require('../../clients/Models/followers');
 const Product=require('../../products/Models/product')
 const Vendor=require('../../vendors/Models/vendor');
 const Essay=require('../../admins/Models/Essay');
+const { json } = require('body-parser');
 let hashedPassword ;
 const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 const jwtSecretKey = process.env.SECRET;
@@ -373,13 +374,20 @@ const GetAllFollowers=async(req,res)=>{
     if (!data) {
       return res.status(404).json({ message: 'Client not found' });
     }
-    const vendorIds = data.ClientFollowers.map(vendor => vendor.VendorId);
-    for (const vendorId of vendorIds) {
-      let vendor=await Vendor.findById(vendorId,{__v:0});
-      vendorsDetails.push(vendor);
+   
+    let venLen=0;
+  
+let result = [];
+    for (const vendorId of data) {
+     venLen= vendorId.ClientFollowers.length;
+     for (let i =0 ;i<venLen;i++){
+    let vendorData=await Vendor.findById(vendorId.ClientFollowers[i].VendorId);
+     //console.log(vendorId.ClientFollowers[i].VendorId);
+     result.push(vendorData);
+     }
     }
     
-    return res.status(200).json({message: "your followers",vendorsDetails });
+    return res.status(200).json({message: "your followers","result":result });
   } catch (err) {
    
     return res.status(500).json({ message: 'Internal server error',"error":err.message });

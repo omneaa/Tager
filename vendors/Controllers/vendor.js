@@ -11,6 +11,10 @@ const Client=require('../../clients/Models/client')
 const productModel=require('../../products/Models/product');
 const axios = require('axios');
 const httpRequest = require('https');
+function validEmail(email){
+    const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
+    return regex.test(email);
+  }
 var ID;
 var newRequestCode;
 var vendorName,
@@ -290,7 +294,6 @@ const DeleteVendor=async(req,res)=>{
 		const follow=await FollowersSchema.updateMany({},{ $pull: { 'ClientFollowers':{ VendorId:req.params.Id} } });
 		const clients=await Client.updateMany({},{ $pull: { 'FavouriteProducts':{ vendorId:req.params.Id} } });
 		const result=await Vendor.findByIdAndDelete(req.params.Id);
-		//console.log(clients)
 			
 			res.status(200).json({ message: " account deleted successfully"});
 	} catch (error) {
@@ -306,39 +309,41 @@ const DeleteVendor=async(req,res)=>{
 /*4*/
 const EditVendor=async(req,res)=>{
 	try{
-		if(req.params.Status==="1"){
 		const result=await EditRequest.findById(req.params.Request_Id);
-		const data=await Vendor.findByIdAndUpdate(req.params.Id,{"vendorName":result.vendorName,"brandName":result.brandName
-			,"vendorLocation":result.vendorLocation,vendorPhone:result.vendorPhone,"vendorEmail": result.vendorEmail,
-			"typeOfLicense":result.typeOfLicense, licenseNumber: result.licenseNumber,registeredWithAddedTax:result.registeredWithAddedTax,
-			LicenseFile:result.LicenseFile,"AddedTaxFile":result.AddedTaxFile},{new:true});
-			
-	
+		let editedvendor={...result._doc};
+		delete editedvendor.VendorId;
+		const vendorData = await Vendor.findById(result.VendorId);
+		if(req.params.Status === "1"){
+		const data = await Vendor.findByIdAndUpdate(result.VendorId,{editedvendor},{new:true});
+		res.status(200).json({ message: "the vendor data updated",data})
+
 		let mailDetails = {
 			from: 'abrar.purpose@gmail.com',
-			to: `${req.params.vendorEmail}`,
+			to: `${vendorData.vendorEmail}`,
 			subject: 'Email Code',
 			text: `Hi the Admins approve your Edit request`
-		}
+		                  }
 		mailTransporter.sendMail(mailDetails,function (err, data) {
 					if (err) {
 						console.log('Error Occurs');
 						console.error(err);
 						res.status(500).json(`${err}`);
-					} else {
-						
-						res.status(200).json({ message: "the vendor data updated"});
-
 					}
+					//  else {
+						
+					// 	res.status(200).json({ message: "the vendor data updated",data});
+
+					// }
 				});
 				await EditRequest.findByIdAndDelete(req.params.Request_Id);
 			}
+		
 			else{
 
 				const result=await EditRequest.findByIdAndDelete(req.params.Request_Id);
 				let mailDetails = {
 					from: 'abrar.purpose@gmail.com',
-					to: `${req.params.vendorEmail}`,
+					to: `${vendorData.vendorEmail}`,
 					subject: 'Email Code',
 					text: `Hi the Admins rejected your Edit request`
 				}
@@ -349,8 +354,6 @@ const EditVendor=async(req,res)=>{
 								res.status(500).json(`${err}`);
 							} else {
 								res.status(200).json({ message: "the vendor edit request rejected"});
-								//res.status(200).json({ message: "Done"});
-		
 							}
 						});
 						await EditRequest.findByIdAndDelete(req.params.Request_Id);
@@ -359,6 +362,7 @@ const EditVendor=async(req,res)=>{
 			}
 
 	catch(e){
+		console.log(e);
 		res.status(400).json(e);
 	}
 };
@@ -369,40 +373,53 @@ const EditVendor=async(req,res)=>{
 const EditVendorRequest=async(req,res)=>{
 	try{
 		
-		if (req.body.vendorName.length  === 0||req.body.brandName.length=== 0||req.body.vendorLocation.length===0||req.body.vendorPhone.length===0||req.body.vendorEmail.length===0||
-			req.body.typeOfLicense.length===0||req.body.licenseNumber.length===0||req.body.registeredWithAddedTax.length===0||req.files['AddedTaxFile'][0].path.length===0||
-			req.files['AddedTaxFile'][0].path.length===0
-		 )
-		 {
-			return res.status(400).json({message:"your input not math the fields requirements"});
-		 }
-
-        
-		const data={
-			vendorName: `${req.body.vendorName}`,
-			brandName: `${req.body.brandName}`,
-			vendorLocation: `${req.body.vendorLocation}`,
-			vendorPhone: `${req.body.vendorPhone}`,
-			vendorEmail: `${req.body.vendorEmail}`,
-			typeOfLicense: `${req.body.typeOfLicense}`,
-			licenseNumber: `${req.body.licenseNumber}`,
-			registeredWithAddedTax: `${req.body.registeredWithAddedTax}`,
-			LicenseFile:`${req.files['AddedTaxFile'][0].path}`,
-			AddedTaxFile: `${req.files['AddedTaxFile'][0].path}`,
-			VendorId:req.params.Id,
-		}
-		const result=await EditRequest.create(data);
-		return res.status(200).json({message:"your Request sent to admins" , data : result});;
-console.log(result);
+				let data={
+					...req.body,
+					VendorId:req.params.Id,
+				}
+				if(req.files['LicenseFile']){
+					data.LicenseFile=req.files['LicenseFile'][0].path;
+				}
+				if(req.files['AddedTaxFile']){
+					data.AddedTaxFile=req.files['AddedTaxFile'][0].path;
+				}
+				let result=await EditRequest.create(data);
+				//data={...result._doc};
+				return res.status(200).json({message:"your Request sent to admins" , data : result});
+		        
+			}
+			catch(e){
+		console.log(e);
+				return res.status(500).json({"error":e});
+			}
+		};
 		  
+const EditVendorRequestWithoutPermission=async(req,res)=>{
+	try{
+		
+		const data={
+			...req.body
+		}
+		if(req.body.vendorEmail){
+			if(!validEmail(req.body.vendorEmail)){
+				return res.status(400).json({ "message": "email not valid"});		
+		 }
+		}
+		const isFound=await Vendor.find({$or: [{"vendorEmail":req.body.vendorEmail},{vendorPhone:req.body.vendorPhone}]});
+		if(isFound.length!=0){
+			return res.status(400).json({ "message": "email and phone must be unique"});  
+		}
+		const result=await Vendor.findByIdAndUpdate(req.params.Id,data,{new:true});
+
+
+		return res.status(200).json({message:"data updated" , data : result});;
 		
 	}
 	catch(e){
 
 		return res.status(400).json({error:e});
 	}
-};
-
+}
 
 /*6*/
 const Logout=async(req,res)=>{
@@ -476,5 +493,6 @@ module.exports ={SendCode,ValidateCode
 	DeleteLogo,
 	EditLogo,NewVendorValidateCode,
 	getNumberofvendors,
+	EditVendorRequestWithoutPermission,
 	MessageOtp
 };
