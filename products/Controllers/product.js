@@ -175,6 +175,7 @@ const addReview = async (req, res) => {
     const totalRating = Number(product.totalRating)+Number(rating);
     const averageRating = (Number(totalRating)/(5*(product.reviews.length+1)))*5;
     const newReview = {
+     
       userId,
       rating,
       reviewText, 
@@ -545,6 +546,25 @@ const DeleteProduct =async (req, res) => {
     res.status(500).json({ error: 'Error deleting product' });
   }
 }
+// here Omniaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+// get all reviews by user is  => get to his reviews list 
+const getallreviewsbyuserid= async(req,res)=> {
+  try {
+    const userId = req.params.id;
+    console.log(userId);
+    const products = await productModel.find({ 'reviews.userId': userId });
+
+    
+    res.status(200).json(reviews);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to get products by user id', error: error.message });
+  }
+
+}
+// const findReviewAndupdate = async(req, res)=>{
+ 
+// }
 module.exports = {
   AddProduct,
   getAllproducts,
@@ -564,5 +584,7 @@ module.exports = {
   EditComment ,
   deleteReply,
   EditReply,
-  DeleteProduct
+  DeleteProduct,
+  getallreviewsbyuserid,
+
 };
