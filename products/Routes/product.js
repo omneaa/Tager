@@ -8,7 +8,7 @@ var {AddProduct, getAllproducts ,editProductStatus, addReview , getproductsbyven
   Addchoose, getReviewsByVendorId, getpendingproducts,numberofproductwhichisnotpending,
   addComment, getproductSortedbyCreatedDate , shareproductbyLink , getProductByid,addReply ,
   deletecomment ,EditComment, deleteReply , EditReply ,DeleteProduct,getallreviewsbyuserid 
-, editReview}  = require('../Controllers/product');
+}  = require('../Controllers/product');
 const fileFilter = (req, file, cb) => {
     let ext = path.extname(file.originalname);
     // consloe(ext)
@@ -43,5 +43,5 @@ router.delete('/deletereply/:pId/:cId/:rId',deleteReply);
 router.patch('/editreply/:pId/:cId/:rId',EditReply);
 router.delete('/deleteproduct/:id' , DeleteProduct) ; 
 router.get('/getreviewsbyuserid/:id',getallreviewsbyuserid);
-router.patch('/editreview/:pId/:rId',editReview); 
+// router.patch('/editreview/:pId/:rId',editReview); 
 module.exports = router;

@@ -586,5 +586,5 @@ module.exports = {
   EditReply,
   DeleteProduct,
   getallreviewsbyuserid,
-  editReview
+
 };
