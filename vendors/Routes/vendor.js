@@ -7,6 +7,7 @@ const path = require('path');
 const {auth} = require('../../middlewares/auth') ;
 bodyParser.json();
 var router = express.Router();
+
 const {ValidateCode,SendCode,NewVendor,NewVendorRequest,Logout,EditLogo,DeleteLogo,DeleteVendor,EditVendor,EditVendorRequest
   ,NewVendorValidateCode,getNumberofvendors,EditVendorRequestWithoutPermission,LoginValidateOtp
   ,MessageOtp,SignupPhoneValideCode
