@@ -8,7 +8,8 @@ const {auth} = require('../../middlewares/auth') ;
 bodyParser.json();
 var router = express.Router();
 const {ValidateCode,SendCode,NewVendor,NewVendorRequest,Logout,EditLogo,DeleteLogo,DeleteVendor,EditVendor,EditVendorRequest
-  ,NewVendorValidateCode,getNumberofvendors,MessageOtp
+  ,NewVendorValidateCode,getNumberofvendors,EditVendorRequestWithoutPermission
+  ,MessageOtp
 }=require('../Controllers/vendor');
 var ID;
 
@@ -58,11 +59,12 @@ router.delete('/logo/:Id',auth,DeleteLogo);
 
 router.delete('/vendor/:Id',auth,DeleteVendor);
 
-router.patch('/vendor/:Id/:Request_Id/:Status/:vendorEmail',
+router.patch('/vendor/:Request_Id/:Status',
 upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }])
 ,EditVendor);
 
 router.post('/edit-vendor-request/:Id',auth,upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),EditVendorRequest);
+router.post('/edit-vendor-request-nopermissin/:Id',EditVendorRequestWithoutPermission);
 
 router.post('/logout',auth,Logout);
 router.get('/numberofvendors' ,getNumberofvendors);

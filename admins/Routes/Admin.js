@@ -27,6 +27,7 @@ const fileFilter = (req, file, cb) => {
 
 router.post('/new-admin/:adminId',auth,AddNewAdmin);
 router.post('/new-super-admin/:adminId',auth,AddNewSuperAdmin);
+//router.post('/new-super-admin',AddNewSuperAdmin);
 router.post('/new-vendor/:adminId',auth,upload.fields([{ name: 'AddedTaxFile', maxCount: 1 }, { name: 'LicenseFile', maxCount: 1 }]),AddVendor);
 router.delete('/vendor/:id/:adminId',auth,DeleteVendor);
 //

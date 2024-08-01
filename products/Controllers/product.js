@@ -263,7 +263,9 @@ const Addchoose = async (req, res) => {
 const getproductsbyvendorid = async (req, res) => {
   try {
     const vendorId = req.params.id;
+    console.log(vendorId);
     const products = await productModel.find({ idVendor: vendorId });
+    console.log(products);
     return res
       .status(200)
       .json({ message: "Products retrieved successfully", data: products });

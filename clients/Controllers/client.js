@@ -1,321 +1,210 @@
 const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const Client = require('../../clients/Models/client');
-const Followers = require('../../clients/Models/followers');
-const Product = require('../../products/Models/product')
-const Vendor = require('../../vendors/Models/vendor');
-const Essay = require('../../admins/Models/Essay');
-let hashedPassword;
+const jwt=require('jsonwebtoken');
+const Client=require('../../clients/Models/client');
+const Followers=require('../../clients/Models/followers');
+const Product=require('../../products/Models/product')
+const Vendor=require('../../vendors/Models/vendor');
+const Essay=require('../../admins/Models/Essay');
+const { json } = require('body-parser');
+let hashedPassword ;
 const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 const jwtSecretKey = process.env.SECRET;
 
-const login = async (req, res) => {
-  try {
-    let data;
-    let result = await Client.find({
-      "Email": req.params.Email
-    }, {
-      "FavouriteProducts": 0,
-      _id: 1
-    });
-    const found = JSON.stringify(result);
-    if (found === "[]") {
-      return res.status(400).json({
-        "message": "this email not found"
-      });
+
+
+function validEmail(email){
+  const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
+  return regex.test(email);
+}
+
+const login=async(req,res)=> {
+    try{
+      let data;
+        let result=await Client.find({"Email":req.params.Email},{"FavouriteProducts":0,_id:1});
+        const found = JSON.stringify(result);
+        if(found==="[]")
+         {
+            return res.status(400).json({"message":"this email not found"});
+         }
+            
+        for (const [key, value] of Object.entries(result)) {
+        let password=value.Password;
+        let ID=value._id;
+        let isPasswordValid = await bcrypt.compareSync(req.params.Password,password);
+        if(isPasswordValid){
+             data = {
+                id:result._id,
+                Email:result.Email
+            };
+            const token = jwt.sign(data, jwtSecretKey);
+            return res.status(200).json({"message":"ok","JWT":token,"Client data":result});
+    
+        }
+        else
+        {
+            return res.status(400).json({"message":"the password is wrong "});
+        }
+    }}
+    catch(e){
+        res.status(400).json({"error":e.error});
+    }
+}
+
+const logout=async(req,res)=>{
+    return res.status(200).json({"message":"ok"});
+}
+const viewProductByProductId=async(req,res)=>{
+const result= await Product.findById(req.params.id);
+return res.status(200).json({"message":"done","product":result});
+}
+
+
+
+const ViewLowestPriceProducts=async(req,res)=>{
+const result= await Product.find({"status":"Accepted"}).sort({price:1});
+return res.status(200).json({"message":"lowest price products","product":result});
+}
+
+const ViewHighestPriceProducts=async(req,res)=>{
+    const result= await Product.find({"status":"Accepted"}).sort({price:-1});
+    return res.status(200).json({"message":"highest price products","product":result});
     }
 
-    for (const [key, value] of Object.entries(result)) {
-      let password = value.Password;
-      let ID = value._id;
-      let isPasswordValid = await bcrypt.compareSync(req.params.Password, password);
-      if (isPasswordValid) {
-        data = {
-          id: result._id,
-          Email: result.Email
+
+const ViewHighRatedProducts=async(req,res)=>{
+    const result=await Product.find({"status":"Accepted"}).sort({averageRating:-1})
+    return res.status(200).json({"message":"high rated products","products":result});
+}
+
+
+const AddVendorReview=async(req,res)=>{
+    try {
+        const { vendorId, userId, rating, reviewText } = req.body;
+         const vendor=await Vendor.findById(vendorId);
+         if(!vendor)
+         {
+          console.log("not found");
+          return res.status(404).json({ message: "vendor not found"});
+         }
+         else
+         {
+         const totalRating = Number(vendor.totalRating)+Number(rating);
+         const averageRating = ((Number(totalRating)/(5*(vendor.reviews.length+1))))*5;
+        const newReview = {
+          userId,
+          rating,
+          reviewText, 
         };
-        const token = jwt.sign(data, jwtSecretKey);
-        return res.status(200).json({
-          "message": "ok",
-          "JWT": token,
-          "Client data": result
-        });
-
-      } else {
-        return res.status(400).json({
-          "message": "the password is wrong "
-        });
+         
+        const updatedReviews = await Vendor.findByIdAndUpdate(
+          vendorId,
+          { $push: { reviews: newReview }},{ new: true }
+        );
+    
+        const updated = await Vendor.findByIdAndUpdate(
+          vendorId,
+          { $set: { "totalRating":totalRating,"averageRating":averageRating}},{ new: true }
+        );
+        
+        res
+          .status(201)
+          .json({ message: "Review added successfully to vendor", data: updated});
+      } }catch (error) {
+        res
+          .status(400)
+          .json({ message: "Failed to add review", error: "vendor not found" });
       }
-    }
-  } catch (e) {
-    res.status(400).json({
-      "error": e.error
-    });
+}
+
+
+
+const ViewAllVendorReviews=async(req,res)=>{
+    try {
+        const vendorId = req.params.id;
+        const vendorReviews = await Vendor.findById(vendorId,{reviews:1,averageRating:1});
+    
+        return res
+          .status(200)
+          .json({
+            message: "vendor reviews retrieved successfully",
+            data: vendorReviews,
+          });
+      } catch (error) {
+        console.error(error);
+        return res
+          .status(500)
+          .json({
+            message: "Failed to retrieve product reviews",
+            error: error.message,
+          });
+      }
+      
+}
+const IncreaseProductViews=async(req,res)=>{
+  try{
+  const product=await Product.findById(req.params.id);
+  const views=Number(product.views)+1;
+  const result=await Product.findByIdAndUpdate(req.params.id,{"views":views},{new:true});
+  return res.status(200).json({ message: "views increased", data:result});
+  }
+  catch(e){
+    return res.status(500).json({ message: "Error ", error: error.message});
+  }
+}
+const ViewTrendingProducts=async(req,res)=>{
+  try{
+const result=await Product.find().sort({"views":-1});
+return res.status(200).json({ message: "trending views", products:result});
+  }
+  catch(e)
+  {
+    return res.status(500).json({ message: "Error ", error: error.message});
   }
 }
 
-const logout = async (req, res) => {
-  return res.status(200).json({
-    "message": "ok"
-  });
-}
-const viewProductByProductId = async (req, res) => {
-  const result = await Product.findById(req.params.id);
-  return res.status(200).json({
-    "message": "done",
-    "product": result
-  });
+const SearchByDescription=async(req,res)=>{
+ try{
+ const regex = new RegExp(req.params.description);
+const result=await Product.find({ description: { $regex: regex } ,status:"Accepted"});
+  return res.status(200).json({ message: "products with description", products:result});
 }
 
-
-
-const ViewLowestPriceProducts = async (req, res) => {
-  const result = await Product.find({
-    "status": "Accepted"
-  }).sort({
-    price: 1
-  });
-  return res.status(200).json({
-    "message": "lowest price products",
-    "product": result
-  });
+catch(e){
+  return res.status(500).json({ message: "Error ", error: e.message});
+}
 }
 
-const ViewHighestPriceProducts = async (req, res) => {
-  const result = await Product.find({
-    "status": "Accepted"
-  }).sort({
-    price: -1
-  });
-  return res.status(200).json({
-    "message": "highest price products",
-    "product": result
-  });
-}
-
-
-const ViewHighRatedProducts = async (req, res) => {
-  const result = await Product.find({
-    "status": "Accepted"
-  }).sort({
-    averageRating: -1
-  })
-  return res.status(200).json({
-    "message": "high rated products",
-    "products": result
-  });
-}
-
-
-const AddVendorReview = async (req, res) => {
-  try {
-    const {
-      vendorId,
-      userId,
-      rating,
-      reviewText
-    } = req.body;
-    const vendor = await Vendor.findById(vendorId);
-    if (!vendor) {
-      console.log("not found");
-      return res.status(404).json({
-        message: "vendor not found"
-      });
-    } else {
-      const totalRating = Number(vendor.totalRating) + Number(rating);
-      const averageRating = ((Number(totalRating) / (5 * (vendor.reviews.length + 1)))) * 5;
-      const newReview = {
-        userId,
-        rating,
-        reviewText,
-      };
-
-      const updatedReviews = await Vendor.findByIdAndUpdate(
-        vendorId, {
-          $push: {
-            reviews: newReview
-          }
-        }, {
-          new: true
-        }
-      );
-
-      const updated = await Vendor.findByIdAndUpdate(
-        vendorId, {
-          $set: {
-            "totalRating": totalRating,
-            "averageRating": averageRating
-          }
-        }, {
-          new: true
-        }
-      );
-
-      res
-        .status(201)
-        .json({
-          message: "Review added successfully to vendor",
-          data: updated
-        });
-    }
-  } catch (error) {
-    res
-      .status(400)
-      .json({
-        message: "Failed to add review",
-        error: "vendor not found"
-      });
-  }
-}
-
-
-
-const ViewAllVendorReviews = async (req, res) => {
-  try {
-    const vendorId = req.params.id;
-    const vendorReviews = await Vendor.findById(vendorId, {
-      reviews: 1,
-      averageRating: 1
-    });
-
-    return res
-      .status(200)
-      .json({
-        message: "vendor reviews retrieved successfully",
-        data: vendorReviews,
-      });
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({
-        message: "Failed to retrieve product reviews",
-        error: error.message,
-      });
-  }
-
-}
-const IncreaseProductViews = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    const views = Number(product.views) + 1;
-    const result = await Product.findByIdAndUpdate(req.params.id, {
-      "views": views
-    }, {
-      new: true
-    });
-    return res.status(200).json({
-      message: "views increased",
-      data: result
-    });
-  } catch (e) {
-    return res.status(500).json({
-      message: "Error ",
-      error: error.message
-    });
-  }
-}
-const ViewTrendingProducts = async (req, res) => {
-  try {
-    const result = await Product.find().sort({
-      "views": -1
-    });
-    return res.status(200).json({
-      message: "trending views",
-      products: result
-    });
-  } catch (e) {
-    return res.status(500).json({
-      message: "Error ",
-      error: error.message
-    });
-  }
-}
-
-const SearchByDescription = async (req, res) => {
-  try {
-    const regex = new RegExp(req.params.description);
-    const result = await Product.find({
-      description: {
-        $regex: regex
-      },
-      status: "Accepted"
-    });
-    return res.status(200).json({
-      message: "products with description",
-      products: result
-    });
-  } catch (e) {
-    return res.status(500).json({
-      message: "Error ",
-      error: e.message
-    });
-  }
-}
-
-const AddFavouriteProduct = async (req, res) => {
-  try {
-    const {
-      productId,
-      vendorId
-    } = req.params;
-    const ID = {
+const AddFavouriteProduct=async(req,res)=>{
+  try{
+    const {productId,vendorId}=req.params;
+    const ID={
       productId
     }
-    const result = await Client.findByIdAndUpdate(req.params.clientId, {
-      $push: {
-        FavouriteProducts: {
-          ProductId: productId,
-          vendorId: vendorId
-        }
-      }
-    }, {
-      new: true
-    });
+   const result=await Client.findByIdAndUpdate(req.params.clientId,{$push:{FavouriteProducts:{ ProductId: productId,vendorId:vendorId}}},{new:true});
 
-    return res.status(200).json({
-      message: "product added to your favourite products",
-      result: result
-    });
-  } catch (e) {
-    return res.status(500).json({
-      message: "Error ",
-      error: e.message
-    });
-  }
+  return res.status(200).json({ message: "product added to your favourite products",result:result});
+}
+catch(e){
+  return res.status(500).json({ message: "Error ", error: e.message});
+}
 
 }
 
-const DeleteFavouriteProduct = async (req, res) => {
-  try {
-    const {
+const DeleteFavouriteProduct=async(req,res)=>{
+  try{
+    const {productId}=req.params;
+    const ID={
       productId
-    } = req.params;
-    const ID = {
-      productId
-    }
-    const result = await Client.findByIdAndUpdate(req.params.clientId, {
-      $pull: {
-        FavouriteProducts: {
-          ProductId: productId
-        }
-      }
-    }, {
-      new: true
-    });
+    }                                                                      
+  const result=await Client.findByIdAndUpdate(req.params.clientId,{$pull:{FavouriteProducts:{ ProductId: productId }}},{new:true});
 
-    return res.status(200).json({
-      message: "product deleted from your favourite products",
-      result: result
-    });
-  } catch (e) {
-    return res.status(500).json({
-      message: "Error ",
-      error: e.message
-    });
-  }
+  return res.status(200).json({ message: "product deleted from your favourite products",result:result});
+}
+catch(e){
+  return res.status(500).json({ message: "Error ", error: e.message});
+}
 
 }
 
@@ -326,404 +215,188 @@ const GetAllFavouriteProducts = async (req, res) => {
   const clientId = req.params.clientId;
   const productDetails = [];
   try {
-    const data = await Client.findById(clientId, {
-      FavouriteProducts: 1,
-      _id: 0
-    });
+    const data = await Client.findById(clientId,{ FavouriteProducts: 1, _id: 0 });
     if (!data) {
-      return res.status(404).json({
-        message: 'Client not found'
-      });
+      return res.status(404).json({ message: 'Client not found' });
     }
     const productIds = data.FavouriteProducts.map(product => product.ProductId);
     for (const productId of productIds) {
-      let product = await Product.findById(productId, {
-        __v: 0
-      });
+      let product=await Product.findById(productId,{__v:0});
       productDetails.push(product);
     }
     return res.status(200).json({
-      message: "your favourite products",
-      productDetails,
+      message: "your favourite products",productDetails,
     });
   } catch (err) {
     console.error('Error fetching client or favorite products:', err);
-    return res.status(500).json({
-      message: 'Internal server error'
-    });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 
 
-const FollowVendor = async (req, res) => {
-  try {
-    const {
-      vendorId
-    } = req.params;
-    const ID = {
-      vendorId
-    }
+const FollowVendor=async(req,res)=>{
+  try{
+  const {vendorId}=req.params;
+const ID={
+  vendorId
+}
 
 
-    let result = await Followers.findOneAndUpdate({
-      "ClientId": req.params.clientId
-    }, {
-      $push: {
-        ClientFollowers: {
-          VendorId: vendorId
-        }
-      }
-    }, {
-      new: true
-    });
-    if (!result) {
-      return result = await Followers.create({
-        "ClientId": req.params.clientId
-      }, {
-        $push: {
-          ClientFollowers: {
-            VendorId: vendorId
-          }
-        }
-      });
-    } else {
-      return res.status(200).json({
-        message: "now you follow new vendor",
-        result: result
-      });
-    }
-  } catch (e) {
-    return res.status(500).json({
-      message: "Error ",
-      error: e.message
-    });
+let result=await Followers.findOneAndUpdate({"ClientId":req.params.clientId},{$push:{ClientFollowers:{ VendorId: vendorId }}},{new:true});
+if(!result){
+   return result=await Followers.create({"ClientId":req.params.clientId},{$push:{ClientFollowers:{ VendorId: vendorId }}});
+}
+else{
+return res.status(200).json({ message: "now you follow new vendor",result:result});
+}
+  }
+  catch(e){
+    return res.status(500).json({ message: "Error ", error: e.message});
   }
 }
 
-const UnfollowVendor = async (req, res) => {
-  try {
-    const {
+const UnfollowVendor=async(req,res)=>{
+  try{
+    const {vendorId}=req.params;
+    const ID={
       vendorId
-    } = req.params;
-    const ID = {
-      vendorId
-    }
-    const result = await Followers.findOneAndUpdate({
-      "ClientId": req.params.clientId
-    }, {
-      $pull: {
-        ClientFollowers: {
-          VendorId: vendorId
-        }
-      }
-    }, {
-      new: true
-    });
+    }                                                                      
+  const result=await Followers.findOneAndUpdate({"ClientId":req.params.clientId},{$pull:{ClientFollowers:{ VendorId:vendorId }}},{new:true});
 
-    return res.status(200).json({
-      message: "now you unfollwed vendor",
-      result: result
-    });
-  } catch (e) {
-    return res.status(500).json({
-      message: "Error ",
-      error: e.message
-    });
-  }
+  return res.status(200).json({ message: "now you unfollwed vendor",result:result});
+}
+catch(e){
+  return res.status(500).json({ message: "Error ", error: e.message});
+}
 
 }
 
 
-const ClientSignup = async (req, res) => {
+const ClientSignup=async(req,res)=>{
 
-  try {
-    const {
-      Email,
-      Password,
-      FirstName,
-      LastName,
-      PhoneNumber
-    } = req.body;
-    const isClient = await Client.find({
-      $or: [{
-        "Email": Email
-      }, {
-        PhoneNumber: PhoneNumber
-      }]
-    });
-    if (isClient.length !== 0) {
+  try{
+    const {Email,Password,FirstName,LastName,PhoneNumber}=req.body;
+    if(!validEmail(req.body.Email)){
+      return res.status(400).json({ "message": "email not valid"});
+}  
 
-      return res.status(400).json({
-        "message": "email or phone exist"
-      });
-    } else {
-      hashedPassword = await bcrypt.hash(Password, 10);
-      const newclient = {
-        Email: Email,
-        Password: hashedPassword,
-        FirstName: FirstName,
-        LastName: LastName,
-        PhoneNumber: PhoneNumber
+      const isClient=await Client.find({$or: [{"Email":Email},{PhoneNumber:PhoneNumber}]});
+      if(isClient.length!==0){
+       
+          return res.status(400).json({ "message": "email or phone exist"});
       }
-      const result = await Client.create(newclient);
-      return res.status(200).json({
-        "message": "signed up successfully",
-        "data": result
-      });
-    }
-  } catch (e) {
-    res.status(400).json({
-      "error": e.error
-    });
+      else
+      {
+   hashedPassword = await bcrypt.hash(Password, 10);
+  const newclient={
+      Email:Email,
+      Password:hashedPassword,
+      FirstName:FirstName,
+      LastName:LastName,
+      PhoneNumber:PhoneNumber
+  }
+  const result=await Client.create(newclient);
+  return res.status(200).json({"message":"signed up successfully","data":result});
   }
 }
+  catch(e){
+      res.status(400).json({"error":e.error});
+  }
+  }
 
 
-const AllEssays = async (req, res) => {
-  try {
-
+  const AllEssays=async(req,res)=>{
+    try{
+    
     const result = await Essay.find();
-    return res.status(200).json({
-      "message": "all essays",
-      "result": result
-    });
-  } catch (e) {
-    res.status(400).json({
-      "error": e.error
-    });
-  }
+    return res.status(200).json({ "message": "all essays","result":result});
+}catch(e){
+    res.status(400).json({"error":e.error});
+}
 }
 
-const DeleteClient = async (req, res) => {
-  try {
-
-    const result = await Client.findByIdAndDelete(req.params.id);
-    return res.status(200).json({
-      "message": "client account deleted"
-    });
-  } catch (e) {
-    res.status(400).json({
-      "error": e.error
-    });
-  }
+const DeleteClient=async(req,res)=>{
+  try{
+ 
+  const result=await Client.findByIdAndDelete(req.params.id);
+  return res.status(200).json({"message":"client account deleted"});
 }
-const EditProfile = async (req, res) => {
-  try {
-
-    if (req.body.Email) {
-      const EmailCheck = await Client.find({
-        "Email": req.body.Email
-      });
-      if (EmailCheck.length !== 0) {
-        return res.status(400).json({
-          message: "the new email exist"
-        });
+catch(e){
+  res.status(400).json({"error":e.error});
+}
+}
+const EditProfile=async(req,res)=>{
+  try{	
+    
+    if(req.body.Email){
+      if(!validEmail(req.body.Email)){
+        return res.status(400).json({ "message": "email not valid"});
+ }
+      const EmailCheck=await Client.find({"Email":req.body.Email});
+      if(EmailCheck.length !==0)
+      {
+        return res.status(400).json({ message: "the new email exist"});
       }
+      
     }
-    if (req.body.PhoneNumber) {
-      const PhoneCheck = await Client.find({
-        "PhoneNumber": req.body.PhoneNumber
-      });
-      if (PhoneCheck.length !== 0) {
-        return res.status(400).json({
-          message: "the new Phone number exist"
-        });
+    if(req.body.PhoneNumber){
+      const PhoneCheck=await Client.find({"PhoneNumber":req.body.PhoneNumber});
+      if(PhoneCheck.length!==0)
+      {
+        return res.status(400).json({ message: "the new Phone number exist"});
       }
     }
 
 
-    if (req.body.Password) {
-      const hashedPassword = await bcrypt.hash(req.body.Password, 10);
-      req.body.Password = hashedPassword;
-    }
+    
+if(req.body.Password){
+const hashedPassword = await bcrypt.hash(req.body.Password, 10);
+req.body.Password=hashedPassword;
+}
 
 
-    const data = await Client.findByIdAndUpdate(req.params.id, {
-      $set: req.body
-    }, {
-      new: true,
-      select: "FirstName LastName _id Email"
-    });
-    return res.status(200).json({
-      message: "profile edited",
-      data: data
-    });
-  } catch (err) {
-    return res.status(500).json({
-      error: err.message
-    });
-  }
+        const data =await Client.findByIdAndUpdate(req.params.id,{$set:req.body},{new: true,select: "FirstName LastName _id Email"});
+        return res.status(200).json({ message: "profile edited", data:data});
+        }
+        catch(err){
+          return res.status(500).json({ error: err.message});
+        }
 }
 
 
 
 //Not complete have bug
-const GetAllFollowers = async (req, res) => {
+const GetAllFollowers=async(req,res)=>{
   const clientId = req.params.clientId;
   const vendorsDetails = [];
   try {
-    const data = await Followers.find({
-      "ClientId": clientId
-    }, {
-      ClientFollowers: 1,
-      _id: 0
-    });
-    //return res.json({data});
+    const data = await Followers.find({"ClientId":clientId},{ClientFollowers: 1, _id: 0 });
     if (!data) {
-      return res.status(404).json({
-        message: 'Client not found'
-      });
+      return res.status(404).json({ message: 'Client not found' });
     }
-    const vendorIds = data.ClientFollowers.map(vendor => vendor.VendorId);
-    for (const vendorId of vendorIds) {
-      let vendor = await Vendor.findById(vendorId, {
-        __v: 0
-      });
-      vendorsDetails.push(vendor);
+   
+    let venLen=0;
+  
+let result = [];
+    for (const vendorId of data) {
+     venLen= vendorId.ClientFollowers.length;
+     for (let i =0 ;i<venLen;i++){
+    let vendorData=await Vendor.findById(vendorId.ClientFollowers[i].VendorId);
+     //console.log(vendorId.ClientFollowers[i].VendorId);
+     result.push(vendorData);
+     }
     }
-
-    return res.status(200).json({
-      message: "your followers",
-      vendorsDetails,
-    });
+    
+    return res.status(200).json({message: "your followers","result":result });
   } catch (err) {
-
-    return res.status(500).json({
-      message: 'Internal server error',
-      "error": err.message
-    });
+   
+    return res.status(500).json({ message: 'Internal server error',"error":err.message });
   }
 }
 
-const addAddresses=async(req,res)=>{
-  try{
-    clientId = req.params.cid ; 
-   
-    console.log(req.body);
-    const result = await Client.findByIdAndUpdate(clientId,{
-      $push:{
-        addresses:req.body
-      }
-    },{
-      new:true
-    });
-    return res.status(200).json({
-      message:"addresses added successfully",
-      result:result
-    });
-  }catch(e){
-    return res.status(500).json({
-      message:"Error to add addresses",
-      error:e.message
-    });
-  }
- 
-}
-const EditAddress =async(req,res)=>{
-  try{
-    clientId = req.params.cid ; 
-    addressId = req.params.aid ;
-   
-    console.log(req.body);
-    const result = await Client.findByIdAndUpdate(clientId,{
-      $set:{
-        "addresses.$[elem].addressLine1":req.body.addressLine1,
-        "addresses.$[elem].addressLine2":req.body.addressLine2,
-        "addresses.$[elem].city":req.body.city,
-        "addresses.$[elem].state":req.body.state,
-        "addresses.$[elem].zip":req.body.zip,
-        "addresses.$[elem].country":req.body.country,
-        "addresses.$[elem].isDefault":req.body.isDefault
-      }
-    },{
-      arrayFilters:[{ "elem._id": addressId }]
-    },{
-      new:true
-    });
-    return res.status(200).json({
-      message:"address edited successfully",
-    });
-  }catch(e){
-    return res.status(500).json({
-      message:"Error to edit addresses",
-      error:e.message
-    });
-  }
-}
 
-const DeleteAddress =async(req,res)=>{
-  try{
-    clientId = req.params.cid ; 
-    addressId = req.params.aid ;
-   
-    console.log(req.body);
-    const result = await Client.findByIdAndUpdate(clientId,{
-      $pull:{
-        addresses:{
-          _id:addressId
-        }
-      }
-    },{
-      new:true
-    });
-    return res.status(200).json({
-      message:"address deleted successfully",
-    });
-  }catch(e){
-    return res.status(500).json({
-      message:"Error to delete addresses",
-      error:e.message
-    });
-  }
-}
-const GetallAddress= async (req, res) => {
-  const clientId = req.params.cid;
-  try {
-    const data = await Client.findById(clientId, {
-      addresses: 1,
-      _id: 0
-    });
-    if (!data) {
-      return res.status(404).json({
-        message: 'Client not found'
-      });
-    }
-    return res.status(200).json({
-      message: "your addresses",
-      data: data.addresses
-    });
-  } catch (err) {
-    return res.status(500).json({
-      message: 'Internal server error',
-      "error": err.message
-    });
-  }
-}
-module.exports = {
-  login,
-  logout,
-  viewProductByProductId,
-  ViewLowestPriceProducts,
-  ViewHighestPriceProducts,
-  ViewHighRatedProducts,
-  AddVendorReview,
-  ViewAllVendorReviews,
-  IncreaseProductViews,
-  ViewTrendingProducts,
-  SearchByDescription,
-  AddFavouriteProduct,
-  DeleteFavouriteProduct,
-  GetAllFavouriteProducts,
-  FollowVendor,
-  UnfollowVendor,
-  ClientSignup,
-  AllEssays,
-  DeleteClient,
-  EditProfile,
-  GetAllFollowers,
-  addAddresses,
-  EditAddress,
-  DeleteAddress,
-  GetallAddress
-};
+module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
+    ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct,DeleteFavouriteProduct,GetAllFavouriteProducts,
+    FollowVendor,UnfollowVendor,ClientSignup,AllEssays,DeleteClient,EditProfile,GetAllFollowers
+  };
