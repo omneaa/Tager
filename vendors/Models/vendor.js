@@ -1,4 +1,5 @@
 const mongoose=require('mongoose');
+const Int64String = String;
 const vendorSchema=mongoose.Schema({
     vendorName:{
 type:String,

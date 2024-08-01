@@ -139,7 +139,7 @@ const AddVendor=async(req,res)=>{
            return res.status(400).json({ "message": "email not valid"});
     }
     const isFound=await Vendor.find({$or: [{"vendorEmail":req.body.vendorEmail},{vendorPhone:req.body.vendorPhone}]});
-    if(isFound){
+    if(isFound.length !==0){
         return res.status(400).json({ "message": "email and phone must be unique"});  
     }
     data={

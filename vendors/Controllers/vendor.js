@@ -11,11 +11,14 @@ const Client=require('../../clients/Models/client')
 const productModel=require('../../products/Models/product');
 const axios = require('axios');
 const httpRequest = require('https');
+const { stringify } = require('querystring');
 function validEmail(email){
     const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
     return regex.test(email);
   }
 var ID;
+var PhoneCode;
+var UserPhoneNumber;
 var newRequestCode;
 var vendorName,
 brandName,
@@ -452,28 +455,32 @@ const MessageOtp=async(req,res)=>{
 const options = {
   method: 'POST',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type':'application/json',
+	'msgEncoding':'UTF8'
   },
 };
-
+PhoneCode = Math.trunc(Math.random() * (9999 - 1000) + 1000);
+console.log(PhoneCode);
+PhoneNumber = req.body.PhoneNumber
 const data = `{
   "userName": "Gomalwabas@gmail.com",
-  "numbers": "01099805381",
-  "userSender": "tager",
+  "numbers": ${req.body.PhoneNumber},
+  "userSender": "Gomlawbas",
   "apiKey": "1e9f382946e85ae594a084fab01413f7",
-  "msg": "hi"
+  "msg": "Hi your verficaton code is ${PhoneCode}"
 }`;
 
 const request = httpRequest.request('https://www.msegat.com/gw/sendsms.php', options, response => {
-  console.log('Status', response.statusCode);
-  console.log('Headers', response.headers);
+  //console.log('Status', response.statusCode);
+  //console.log('Headers', response.headers);
   let responseData = '';
 
   response.on('data', dataChunk => {
     responseData += dataChunk;
+	//console.log(responseData)
   });
   response.on('end', () => {
-    console.log('Response: ', responseData)
+	return res.json({'Response:':response.statusCode});
   });
 });
 
@@ -481,6 +488,53 @@ request.on('error', error => console.log('ERROR', error));
 
 request.write(data);
 request.end();
+}
+const LoginValidateOtp=async(req,res)=>{
+	var code=req.params.code;
+	try{
+	if(code==PhoneCode)
+		{
+			const jwtSecretKey = process.env.SECRET;
+			const user=await Vendor.findOne({vendorPhone:PhoneNumber});
+			const data = {
+				time: Date(),
+			};
+			const token = jwt.sign(data, jwtSecretKey);
+			res.send({"message":'the code is right', "token":token,"data":user});
+		}
+
+		else
+		{ 
+			res.status(400).json("the code is wrong");
+			
+		}
+	}
+	catch(err){
+		res.status(500).json(`${err}`);
+	}
+}
+const SignupPhoneValideCode=async(req,res)=>{
+	var code=req.params.code;
+	try{
+	if(code==PhoneCode)
+		{
+			const jwtSecretKey = process.env.SECRET;
+			const data = {
+				time: Date(),
+			};
+			const token = jwt.sign(data, jwtSecretKey);
+			res.send({"message":'the code is right'});
+		}
+
+		else
+		{ 
+			res.status(400).json("the code is wrong");
+			
+		}
+	}
+	catch(err){
+		res.status(500).json(`${err}`);
+	}
 }
 
 module.exports ={SendCode,ValidateCode
@@ -494,5 +548,6 @@ module.exports ={SendCode,ValidateCode
 	EditLogo,NewVendorValidateCode,
 	getNumberofvendors,
 	EditVendorRequestWithoutPermission,
-	MessageOtp
+	MessageOtp,
+	LoginValidateOtp,SignupPhoneValideCode
 };
