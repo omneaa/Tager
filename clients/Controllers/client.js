@@ -8,16 +8,106 @@ const Product=require('../../products/Models/product')
 const Vendor=require('../../vendors/Models/vendor');
 const Essay=require('../../admins/Models/Essay');
 const { json } = require('body-parser');
+const httpRequest = require('https');
 let hashedPassword ;
 const tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 const jwtSecretKey = process.env.SECRET;
-
+let PhoneCode;
+let PhoneNumber;
 
 
 function validEmail(email){
   const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
   return regex.test(email);
 }
+
+const MessageOtp=async(req,res)=>{
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type':'application/json',
+    'msgEncoding':'UTF8'
+    },
+  };
+  PhoneCode = Math.trunc(Math.random() * (9999 - 1000) + 1000);
+  console.log(PhoneCode);
+  PhoneNumber = req.body.PhoneNumber
+  const data = `{
+    "userName": "Gomalwabas@gmail.com",
+    "numbers": ${req.body.PhoneNumber},
+    "userSender": "Gomlawbas",
+    "apiKey": "1e9f382946e85ae594a084fab01413f7",
+    "msg": "Hi your verficaton code is ${PhoneCode}"
+  }`;
+  
+  const request = httpRequest.request('https://www.msegat.com/gw/sendsms.php', options, response => {
+    //console.log('Status', response.statusCode);
+    //console.log('Headers', response.headers);
+    let responseData = '';
+  
+    response.on('data', dataChunk => {
+      responseData += dataChunk;
+    //console.log(responseData)
+    });
+    response.on('end', () => {
+    return res.json({'Response:':response.statusCode});
+    });
+  });
+  
+  request.on('error', error => console.log('ERROR', error));
+  
+  request.write(data);
+  request.end();
+  }
+
+
+
+const PhoneLogin=async(req,res)=>{
+  var code=req.params.code;
+	try{
+	if(code==PhoneCode)
+		{
+			const jwtSecretKey = process.env.SECRET;
+			const user=await Client.findOne({PhoneNumber:PhoneNumber},{Password:0});
+			const data = {
+				time: Date(),
+			};
+			const token = jwt.sign(data, jwtSecretKey);
+			res.send({"message":'the code is right', "token":token,"data":user});
+		}
+
+		else
+		{ 
+			res.status(400).json("the code is wrong");
+			
+		}
+	}
+	catch(err){
+		res.status(500).json(`${err}`);
+	}
+}
+
+const phoneSignupValidate=async(req,res)=>{
+  var code=req.params.code;
+	try{
+	if(code == PhoneCode)
+		{
+			res.send({"message":'the code is right'});
+		}
+
+		else
+		{ 
+			res.status(400).json("the code is wrong");
+			
+		}
+	}
+	catch(err){
+		res.status(500).json(`${err}`);
+	}
+}
+
+
+
 
 const login=async(req,res)=> {
     try{
@@ -398,5 +488,5 @@ let result = [];
 
 module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
     ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct,DeleteFavouriteProduct,GetAllFavouriteProducts,
-    FollowVendor,UnfollowVendor,ClientSignup,AllEssays,DeleteClient,EditProfile,GetAllFollowers
+    FollowVendor,UnfollowVendor,ClientSignup,AllEssays,DeleteClient,EditProfile,GetAllFollowers,MessageOtp,PhoneLogin,phoneSignupValidate
   };

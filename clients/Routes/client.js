@@ -25,6 +25,9 @@ const {
     DeleteClient,
     EditProfile,
     GetAllFollowers,
+    MessageOtp,
+    PhoneLogin,
+    phoneSignupValidate,
     addAddresses,
     EditAddress,
     DeleteAddress,
@@ -36,12 +39,19 @@ const path = require('path');
 const {
     auth
 } = require('../../middlewares/auth');
+const { SignupPhoneValideCode } = require('../../vendors/Controllers/vendor');
 
 bodyParser.json();
 var router = express.Router();
 
 router.post('/login/:Email/:Password', login);
 router.post('/sign-up', ClientSignup);
+router.post('/signup-Phone-validate-code/:code',phoneSignupValidate);
+router.post('/login-Phone-validate-code/:code',PhoneLogin);
+
+
+
+router.post('/send-otp-phone',MessageOtp);
 router.post('/logout', auth, logout);
 router.get('/view-productByProductId/:id', viewProductByProductId);
 router.get('/The-lowest-price', ViewLowestPriceProducts);
