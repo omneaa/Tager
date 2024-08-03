@@ -28,6 +28,7 @@ const {
     MessageOtp,
     PhoneLogin,
     phoneSignupValidate,
+    GetClientProfile,
     addAddresses,
     EditAddress,
     DeleteAddress,
@@ -75,5 +76,6 @@ router.get('/all-followers/:clientId', auth, GetAllFollowers);
 router.patch('/addAddress/:cid', addAddresses);
 router.patch('/editAddress/:cid/:aid',EditAddress) ;
 router.delete('/deleteAddress/:cid/:aid', DeleteAddress);
-router.get('/Addresses/:cid',GetallAddress) ; 
+router.get('/Addresses/:cid',GetallAddress) ;
+router.get('/client-profile/:clientId', auth,GetClientProfile); 
 module.exports = router;

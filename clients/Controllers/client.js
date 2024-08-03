@@ -150,11 +150,59 @@ const login = async (req, res) => {
           "message": "the password is wrong "
         });
       }
+<<<<<<< HEAD
     }
   } catch (e) {
     res.status(400).json({
       "error": e.error
     });
+=======
+}
+
+
+
+const ViewAllVendorReviews=async(req,res)=>{
+    try {
+        const vendorId = req.params.id;
+        const vendorReviews = await Vendor.findById(vendorId,{reviews:1,averageRating:1});
+    
+        return res
+          .status(200)
+          .json({
+            message: "vendor reviews retrieved successfully",
+            data: vendorReviews,
+          });
+      } catch (error) {
+        console.error(error);
+        return res
+          .status(500)
+          .json({
+            message: "Failed to retrieve product reviews",
+            error: error.message,
+          });
+      }
+      
+}
+const IncreaseProductViews=async(req,res)=>{
+  try{
+  const product=await Product.findById(req.params.id);
+  const views=Number(product.views)+1;
+  const result=await Product.findByIdAndUpdate(req.params.id,{"views":views},{new:true});
+  return res.status(200).json({ message: "views increased", data:result});
+  }
+  catch(e){
+    return res.status(500).json({ message: "Error ", error: error.message});
+  }
+}
+const ViewTrendingProducts=async(req,res)=>{
+  try{
+const result=await Product.find({"status":"Accepted"}).sort({"views":-1});
+return res.status(200).json({ message: "trending views", products:result});
+  }
+  catch(e)
+  {
+    return res.status(500).json({ message: "Error ", error: error.message});
+>>>>>>> 6dd5bd098868ce227eef1e21bdde714560b16078
   }
 }
 
@@ -616,6 +664,7 @@ const DeleteClient = async (req, res) => {
     });
   }
 }
+<<<<<<< HEAD
 const EditProfile = async (req, res) => {
   try {
 
@@ -624,6 +673,30 @@ const EditProfile = async (req, res) => {
         return res.status(400).json({
           "message": "email not valid"
         });
+=======
+catch(e){
+  res.status(400).json({"error":e.error});
+}
+}
+const EditProfile=async(req,res)=>{
+  try{	
+    let ID;
+    if(req.body.Email){
+      if(!validEmail(req.body.Email)){
+        return res.status(400).json({ "message": "email not valid"});
+ }
+      const EmailCheck = await Client.find({"Email":req.body.Email});
+      for (const clientId of EmailCheck) {
+        ID=clientId._id;
+       // console.log(ID)
+        // return res.json(ID);
+      }
+      if(ID != req.params.id)
+      {
+        console.log(typeof(ID));
+        console.log(typeof(req.params.id))
+        return res.status(400).json({ message: "the new email exist"});
+>>>>>>> 6dd5bd098868ce227eef1e21bdde714560b16078
       }
       const EmailCheck = await Client.find({
         "Email": req.body.Email
@@ -635,6 +708,7 @@ const EditProfile = async (req, res) => {
       }
 
     }
+<<<<<<< HEAD
     if (req.body.PhoneNumber) {
       const PhoneCheck = await Client.find({
         "PhoneNumber": req.body.PhoneNumber
@@ -643,6 +717,16 @@ const EditProfile = async (req, res) => {
         return res.status(400).json({
           message: "the new Phone number exist"
         });
+=======
+    if(req.body.PhoneNumber){
+      const PhoneCheck=await Client.find({"PhoneNumber":req.body.PhoneNumber});
+      for (const clientId of PhoneCheck) {
+        ID=clientId._id;
+      }
+      if(ID != req.params.id)
+      {
+        return res.status(400).json({ message: "the new Phone number exist"});
+>>>>>>> 6dd5bd098868ce227eef1e21bdde714560b16078
       }
     }
 
@@ -654,6 +738,7 @@ const EditProfile = async (req, res) => {
     }
 
 
+<<<<<<< HEAD
     const data = await Client.findByIdAndUpdate(req.params.id, {
       $set: req.body
     }, {
@@ -669,6 +754,14 @@ const EditProfile = async (req, res) => {
       error: err.message
     });
   }
+=======
+        const data =await Client.findByIdAndUpdate(req.params.id,{$set:req.body},{new: true,select: "FirstName LastName _id Email PhoneNumber"});
+        return res.status(200).json({ message: "profile edited", data:data});
+        }
+        catch(err){
+          return res.status(500).json({ error: err.message});
+        }
+>>>>>>> 6dd5bd098868ce227eef1e21bdde714560b16078
 }
 
 
@@ -828,6 +921,16 @@ const GetallAddress = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 }
+const GetClientProfile=async(req,res)=>{
+  try{
+  const profile=await Client.findById(req.params.clientId,{Password:0});
+  return res.status(200).json({message: "client profile","data":profile});
+
+  }
+  catch(e){
+    return res.status(500).json({ message: 'Internal server error',"error":e.message });
+  }
+}
 module.exports = {
   login,
   logout,
@@ -856,5 +959,6 @@ module.exports = {
   addAddresses,
   EditAddress,
   DeleteAddress,
-  GetallAddress
+  GetallAddress,
+  GetClientProfile
 };
