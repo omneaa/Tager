@@ -32,6 +32,7 @@ const {
     EditAddress,
     DeleteAddress,
     GetallAddress
+    
 } = require('../Controllers/client');
 const multer = require('multer');
 const bodyParser = require('body-parser');
@@ -71,8 +72,8 @@ router.get('/all-essays',auth,AllEssays);
 router.delete('/client-account/:id',auth,DeleteClient);
 router.patch('/edit-profile/:id', auth,EditProfile);
 router.get('/all-followers/:clientId', auth, GetAllFollowers);
-// router.patch('/addAddress/:cid', addAddresses);
-// router.patch('/editAddress/:cid/:aid',auth,EditAddress) ;
-// router.delete('/deleteAddress/:cid/:aid',auth, DeleteAddress);
-// router.get('/Addresses/:cid',GetallAddress) ; 
+router.patch('/addAddress/:cid', addAddresses);
+router.patch('/editAddress/:cid/:aid',EditAddress) ;
+router.delete('/deleteAddress/:cid/:aid', DeleteAddress);
+router.get('/Addresses/:cid',GetallAddress) ; 
 module.exports = router;

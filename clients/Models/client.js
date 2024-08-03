@@ -35,14 +35,14 @@ const ClientSchema = mongoose.Schema({
     addresses: [{
         addressLine1: {
           type: String,
-          required: true
+          // required: true
         },
         addressLine2: {
           type: String
         },
         city: {
           type: String,
-          required: true
+          // required: true
         },
         state: {
           type: String
@@ -50,11 +50,11 @@ const ClientSchema = mongoose.Schema({
         },
         zipCode: {
           type: String,
-          required: true
+          // required: true
         },
         country: {
           type: String,
-          required: true
+          // required: true
         },
         isDefault: {
           type: Boolean,

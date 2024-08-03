@@ -548,20 +548,44 @@ const DeleteProduct =async (req, res) => {
 }
 // here Omniaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 // get all reviews by user is  => get to his reviews list 
-const getallreviewsbyuserid= async(req,res)=> {
-  try {
-    const userId = req.params.id;
-    console.log(userId);
-    const products = await productModel.find({ 'reviews.userId': userId });
+const getallreviewsbyuserid= async (req, res) => {
+  // try {
+  //   const userId = req.params.id;
 
-    
-    res.status(200).json(reviews);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Failed to get products by user id', error: error.message });
-  }
+  //   const reviews = await productModel.aggregate([
+  //     {
+  //       $unwind: '$reviews'
+  //     },
+  //     {
+  //       $match: { 'reviews.userId':userId  }
+  //     },
+  //     {
+  //       $lookup: {
+  //         from: 'products',
+  //         localField: 'reviews.productId',
+  //         foreignField: '_id',
+  //         as: 'product'
+  //       }
+  //     },
+  //     {
+  //       $unwind: '$product'
+  //     },
+  //     {
+  //       $project: {
+  //         reviews: '$reviews',
+  //         product: '$product'
+  //       }
+  //     }
+  //   ]);
 
-}
+  //   res.status(200).json(reviews);
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ message: 'Failed to get all reviews by user ID', error: error.message });
+  // }
+};
+
+
 // const findReviewAndupdate = async(req, res)=>{
  
 // }
