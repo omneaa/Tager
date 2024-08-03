@@ -28,6 +28,7 @@ const {
     MessageOtp,
     PhoneLogin,
     phoneSignupValidate,
+    GetClientProfile,
     addAddresses,
     EditAddress,
     DeleteAddress,
@@ -71,6 +72,7 @@ router.get('/all-essays',auth,AllEssays);
 router.delete('/client-account/:id',auth,DeleteClient);
 router.patch('/edit-profile/:id', auth,EditProfile);
 router.get('/all-followers/:clientId', auth, GetAllFollowers);
+router.get('/client-profile/:clientId', auth,GetClientProfile);
 // router.patch('/addAddress/:cid', addAddresses);
 // router.patch('/editAddress/:cid/:aid',auth,EditAddress) ;
 // router.delete('/deleteAddress/:cid/:aid',auth, DeleteAddress);

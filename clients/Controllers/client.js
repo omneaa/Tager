@@ -245,7 +245,7 @@ const IncreaseProductViews=async(req,res)=>{
 }
 const ViewTrendingProducts=async(req,res)=>{
   try{
-const result=await Product.find().sort({"views":-1});
+const result=await Product.find({"status":"Accepted"}).sort({"views":-1});
 return res.status(200).json({ message: "trending views", products:result});
   }
   catch(e)
@@ -418,21 +418,31 @@ catch(e){
 }
 const EditProfile=async(req,res)=>{
   try{	
-    
+    let ID;
     if(req.body.Email){
       if(!validEmail(req.body.Email)){
         return res.status(400).json({ "message": "email not valid"});
  }
-      const EmailCheck=await Client.find({"Email":req.body.Email});
-      if(EmailCheck.length !==0)
+      const EmailCheck = await Client.find({"Email":req.body.Email});
+      for (const clientId of EmailCheck) {
+        ID=clientId._id;
+       // console.log(ID)
+        // return res.json(ID);
+      }
+      if(ID != req.params.id)
       {
+        console.log(typeof(ID));
+        console.log(typeof(req.params.id))
         return res.status(400).json({ message: "the new email exist"});
       }
       
     }
     if(req.body.PhoneNumber){
       const PhoneCheck=await Client.find({"PhoneNumber":req.body.PhoneNumber});
-      if(PhoneCheck.length!==0)
+      for (const clientId of PhoneCheck) {
+        ID=clientId._id;
+      }
+      if(ID != req.params.id)
       {
         return res.status(400).json({ message: "the new Phone number exist"});
       }
@@ -446,7 +456,7 @@ req.body.Password=hashedPassword;
 }
 
 
-        const data =await Client.findByIdAndUpdate(req.params.id,{$set:req.body},{new: true,select: "FirstName LastName _id Email"});
+        const data =await Client.findByIdAndUpdate(req.params.id,{$set:req.body},{new: true,select: "FirstName LastName _id Email PhoneNumber"});
         return res.status(200).json({ message: "profile edited", data:data});
         }
         catch(err){
@@ -485,8 +495,17 @@ let result = [];
   }
 }
 
+const GetClientProfile=async(req,res)=>{
+  try{
+  const profile=await Client.findById(req.params.clientId,{Password:0});
+  return res.status(200).json({message: "client profile","data":profile});
 
+  }
+  catch(e){
+    return res.status(500).json({ message: 'Internal server error',"error":e.message });
+  }
+}
 module.exports ={login,logout,viewProductByProductId,ViewLowestPriceProducts,ViewHighestPriceProducts,ViewHighRatedProducts,AddVendorReview
     ,ViewAllVendorReviews,IncreaseProductViews,ViewTrendingProducts,SearchByDescription,AddFavouriteProduct,DeleteFavouriteProduct,GetAllFavouriteProducts,
-    FollowVendor,UnfollowVendor,ClientSignup,AllEssays,DeleteClient,EditProfile,GetAllFollowers,MessageOtp,PhoneLogin,phoneSignupValidate
+    FollowVendor,UnfollowVendor,ClientSignup,AllEssays,DeleteClient,EditProfile,GetAllFollowers,MessageOtp,PhoneLogin,phoneSignupValidate,GetClientProfile
   };
