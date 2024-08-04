@@ -347,26 +347,27 @@ const ViewAllVendorReviews = async (req, res) => {
   }
 
 }
-const IncreaseProductViews = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    const views = Number(product.views) + 1;
-    const result = await Product.findByIdAndUpdate(req.params.id, {
-      "views": views
-    }, {
-      new: true
-    });
-    return res.status(200).json({
-      message: "views increased",
-      data: result
-    });
-  } catch (e) {
-    return res.status(500).json({
-      message: "Error ",
-      error: error.message
-    });
-  }
-}
+  // comment here 3
+// const IncreaseProductViews = async (req, res) => {
+//   try {
+//     const product = await Product.findById(req.params.id);
+//     const views = Number(product.views) + 1;
+//     const result = await Product.findByIdAndUpdate(req.params.id, {
+//       "views": views
+//     }, {
+//       new: true
+//     });
+//     return res.status(200).json({
+//       message: "views increased",
+//       data: result
+//     });
+//   } catch (e) {
+//     return res.status(500).json({
+//       message: "Error ",
+//       error: error.message
+//     });
+//   }
+// }
 const ViewTrendingProducts = async (req, res) => {
   try {
     const result = await Product.find().sort({
@@ -664,20 +665,20 @@ const DeleteClient = async (req, res) => {
     });
   }
 }
+// comment 2 here 
+// const EditProfile = async (req, res) => {
+//   try {
 
-const EditProfile = async (req, res) => {
-  try {
+//     if (req.body.Email) {
+//       if (!validEmail(req.body.Email)) {
+//         return res.status(400).json({
+//           "message": "email not valid"
+//         });
 
-    if (req.body.Email) {
-      if (!validEmail(req.body.Email)) {
-        return res.status(400).json({
-          "message": "email not valid"
-        });
-
-catch(e){
-  res.status(400).json({"error":e.error});
-}
-}
+// catch(e){
+//   res.status(400).json({"error":e.error});
+// }
+// }
 const EditProfile=async(req,res)=>{
   try{	
     let ID;
