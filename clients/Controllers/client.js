@@ -150,13 +150,13 @@ const login = async (req, res) => {
           "message": "the password is wrong "
         });
       }
-<<<<<<< HEAD
+
     }
   } catch (e) {
     res.status(400).json({
       "error": e.error
     });
-=======
+
 }
 
 
@@ -202,7 +202,7 @@ return res.status(200).json({ message: "trending views", products:result});
   catch(e)
   {
     return res.status(500).json({ message: "Error ", error: error.message});
->>>>>>> 6dd5bd098868ce227eef1e21bdde714560b16078
+
   }
 }
 
@@ -664,7 +664,7 @@ const DeleteClient = async (req, res) => {
     });
   }
 }
-<<<<<<< HEAD
+
 const EditProfile = async (req, res) => {
   try {
 
@@ -673,7 +673,7 @@ const EditProfile = async (req, res) => {
         return res.status(400).json({
           "message": "email not valid"
         });
-=======
+
 catch(e){
   res.status(400).json({"error":e.error});
 }
@@ -696,7 +696,7 @@ const EditProfile=async(req,res)=>{
         console.log(typeof(ID));
         console.log(typeof(req.params.id))
         return res.status(400).json({ message: "the new email exist"});
->>>>>>> 6dd5bd098868ce227eef1e21bdde714560b16078
+
       }
       const EmailCheck = await Client.find({
         "Email": req.body.Email
@@ -708,7 +708,7 @@ const EditProfile=async(req,res)=>{
       }
 
     }
-<<<<<<< HEAD
+
     if (req.body.PhoneNumber) {
       const PhoneCheck = await Client.find({
         "PhoneNumber": req.body.PhoneNumber
@@ -717,7 +717,7 @@ const EditProfile=async(req,res)=>{
         return res.status(400).json({
           message: "the new Phone number exist"
         });
-=======
+
     if(req.body.PhoneNumber){
       const PhoneCheck=await Client.find({"PhoneNumber":req.body.PhoneNumber});
       for (const clientId of PhoneCheck) {
@@ -726,7 +726,7 @@ const EditProfile=async(req,res)=>{
       if(ID != req.params.id)
       {
         return res.status(400).json({ message: "the new Phone number exist"});
->>>>>>> 6dd5bd098868ce227eef1e21bdde714560b16078
+
       }
     }
 
@@ -738,7 +738,7 @@ const EditProfile=async(req,res)=>{
     }
 
 
-<<<<<<< HEAD
+
     const data = await Client.findByIdAndUpdate(req.params.id, {
       $set: req.body
     }, {
@@ -754,14 +754,14 @@ const EditProfile=async(req,res)=>{
       error: err.message
     });
   }
-=======
+
         const data =await Client.findByIdAndUpdate(req.params.id,{$set:req.body},{new: true,select: "FirstName LastName _id Email PhoneNumber"});
         return res.status(200).json({ message: "profile edited", data:data});
         }
         catch(err){
           return res.status(500).json({ error: err.message});
         }
->>>>>>> 6dd5bd098868ce227eef1e21bdde714560b16078
+
 }
 
 
