@@ -194,17 +194,19 @@ const IncreaseProductViews=async(req,res)=>{
     return res.status(500).json({ message: "Error ", error: error.message});
   }
 }
-const ViewTrendingProducts=async(req,res)=>{
-  try{
-const result=await Product.find({"status":"Accepted"}).sort({"views":-1});
-return res.status(200).json({ message: "trending views", products:result});
-  }
-  catch(e)
-  {
-    return res.status(500).json({ message: "Error ", error: error.message});
+  
+  // comment here 4
+// const ViewTrendingProducts=async(req,res)=>{
+//   try{
+// const result=await Product.find({"status":"Accepted"}).sort({"views":-1});
+// return res.status(200).json({ message: "trending views", products:result});
+//   }
+//   catch(e)
+//   {
+//     return res.status(500).json({ message: "Error ", error: error.message});
 
-  }
-}
+//   }
+// }
 
 const logout = async (req, res) => {
   return res.status(200).json({
