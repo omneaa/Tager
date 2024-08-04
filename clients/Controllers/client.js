@@ -160,29 +160,29 @@ const login = async (req, res) => {
 }
 
 
-
-const ViewAllVendorReviews=async(req,res)=>{
-    try {
-        const vendorId = req.params.id;
-        const vendorReviews = await Vendor.findById(vendorId,{reviews:1,averageRating:1});
+// comment here here !!!
+// const ViewAllVendorReviews=async(req,res)=>{
+//     try {
+//         const vendorId = req.params.id;
+//         const vendorReviews = await Vendor.findById(vendorId,{reviews:1,averageRating:1});
     
-        return res
-          .status(200)
-          .json({
-            message: "vendor reviews retrieved successfully",
-            data: vendorReviews,
-          });
-      } catch (error) {
-        console.error(error);
-        return res
-          .status(500)
-          .json({
-            message: "Failed to retrieve product reviews",
-            error: error.message,
-          });
-      }
+//         return res
+//           .status(200)
+//           .json({
+//             message: "vendor reviews retrieved successfully",
+//             data: vendorReviews,
+//           });
+//       } catch (error) {
+//         console.error(error);
+//         return res
+//           .status(500)
+//           .json({
+//             message: "Failed to retrieve product reviews",
+//             error: error.message,
+//           });
+//       }
       
-}
+// }
 const IncreaseProductViews=async(req,res)=>{
   try{
   const product=await Product.findById(req.params.id);
